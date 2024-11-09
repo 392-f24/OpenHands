@@ -1,0 +1,118 @@
+name: Firebase Preview Deploy
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      - name: 📂 Install dependencies
+        run: npm ci
+
+      - name: 🔨 Build the app
+        run: npm run build
+
+      # 🚨 Run Lint check
+      - name: 🚨 Run Lint
+        run: npm run lint:fix | tee lint-results.txt
+
+      # 🎨 Run Prettier format check
+      - name: 🎨 Run Prettier
+        run: npm run format | tee prettier-results.txt
+
+      - name: 🧪 Test the app with Vitest
+        run: npm run test:ci | tee test-results.txt
+      # 🚮 Clean up all results for comment
+      - name: 🚮 Clean up results
+        run: |
+          sed -i 's/\x1b\[[0-9;]*m//g' prettier-results.txt
+          sed -i 's/\x1b\[[0-9;]*m//g' lint-results.txt
+          sed -i 's/\x1b\[[0-9;]*m//g' test-results.txt
+
+      # 📄 Format all results for better readability
+      - name: 📄 Format all results
+        run: |
+          {
+            echo "### 🧪 Test Results"
+            echo ""
+            if grep -q "failed" test-results.txt; then
+              echo "❌ **Some tests failed**:"
+              echo '```'
+              grep -E "Test Files|Tests|Duration|failed" test-results.txt
+              echo '```'
+              echo "💥 Please review the failed tests above."
+            else
+              echo "✅ **Tests Passed**: All tests passed successfully!"
+            fi
+            echo ""
+            echo "---"
+            echo  ""
+            echo "### 🎨 Prettier Format Check"
+            echo ""
+            if grep -q "(changed)" prettier-results.txt; then
+              echo "⚠️ **Prettier Issues Found** - Some format issues are fixed automatically by Prettier:"
+              echo '```'
+              grep -E "\s+\(changed\)" prettier-results.txt || true
+              echo '```'
+            else
+              echo "✅ **Prettier**: No formatting issues found!"
+            fi
+            echo ""
+            echo "### 🎨 Lint Check"
+            echo ""
+            if grep -qE "^[^0]* problems" lint-results.txt; then
+              echo "⚠️ **Lint Issues Found** - PLEASE FIX THEM!"
+              echo '```'
+              cat lint-results.txt
+              echo '```'
+            else
+              echo "✅ **Lint**: No linting issues found!"
+            fi
+          } > formatted-results.txt
+
+      - name: 🚀 Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: 🌐 Deploy to Firebase Preview Channel
+        id: firebase_deploy
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          firebase hosting:channel:deploy pr-${{ github.event.number }} --expires 2d | tee deploy-output.txt
+
+      - name: 🔗 Extract Preview URL
+        id: extract_url
+        run: |
+          URL=$(grep -oP 'https:\/\/[^\s]+pr-${{ github.event.number }}[^\s]+' deploy-output.txt)
+          echo "PREVIEW_URL=${URL}" >> $GITHUB_ENV
+
+      - name: 💬 Post test results and preview link to PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const previewUrl = process.env.PREVIEW_URL;
+            const fs = require('fs');
+            const testResults = fs.readFileSync('formatted-results.txt', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🚀 Preview for this PR is available at: ${previewUrl} \n\n ${testResults}`
+            });

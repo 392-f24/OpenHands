@@ -1,0 +1,13 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content {
+  flex: 1;
+  padding: 10px;
+  margin: auto;
+  padding-bottom: 56px; /* Space for the bottom navigation */
+  max-width: 800px;
+}
