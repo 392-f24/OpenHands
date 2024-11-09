@@ -42,11 +42,12 @@ jobs:
       - name: 🎨 Format Code
         run: npm run format
 
-      - name: 🧪 Run Tests with Vitest
-        run: npm run test:ci
-
       - name: 🧱 Build Project
         run: npm run build
+
+      - name: 🧪 Run Tests with Vitest
+        if: success()
+        run: npm run test:ci
 
       - name: 🌍 Install Firebase Tools
         if: success()

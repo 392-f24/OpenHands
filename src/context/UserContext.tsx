@@ -2,7 +2,12 @@ import React, { createContext } from 'react';
 
 import LoadingCircle from '@/components/common/LoadingCircle';
 
-const UserContest = createContext<UserContextType>({} as UserContextType);
+interface UserContext {
+  user: User | undefined;
+  loading: boolean;
+}
+
+const UserContest = createContext<UserContext>({} as UserContext);
 
 const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const user = {

@@ -47,13 +47,13 @@ jobs:
               if (file.filename.startsWith('src/hooks')) {
                 labels.add('hooks');
               }
-              if (file.filename.startsWith('src/utils') || file.filename.startsWith('src/utils/firebase')) {
+              if (file.filename.startsWith('src/utils'))) {
                 labels.add('utils');
               }
               if (file.filename.startsWith('src/context')) {
                 labels.add('context');
               }
-              if (file.filename.startsWith('public') || file.filename.startsWith('src/utils/theme')) {
+              if (file.filename.startsWith('public') || file.filename.startsWith('src/assets')) {
                 labels.add('assets');
               }
             });
