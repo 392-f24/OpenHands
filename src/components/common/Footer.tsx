@@ -1,17 +1,22 @@
-import HomeIcon from '@mui/icons-material/Home';
-import PersonIcon from '@mui/icons-material/Person';
+import { Home, Bookmark, Notifications } from '@mui/icons-material';
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 
 // Get the index of the page based on the path
 const getPageIndex = (path: string) => {
   switch (path) {
-    case '/':
+    case '/': {
       return 0;
-    case '/me':
+    }
+    case '/saved': {
       return 1;
-    default:
+    }
+    case '/alerts': {
+      return 2;
+    }
+    default: {
       return 0;
+    }
   }
 };
 
@@ -34,15 +39,21 @@ export default function Footer() {
     >
       <BottomNavigationAction
         label='Home'
-        icon={<HomeIcon />}
+        icon={<Home />}
         component={Link}
         to='/'
       />
       <BottomNavigationAction
-        label='Me'
-        icon={<PersonIcon />}
+        label='Saved'
+        icon={<Bookmark />}
         component={Link}
-        to='/me'
+        to='/saved'
+      />
+      <BottomNavigationAction
+        label='Alerts'
+        icon={<Notifications />}
+        component={Link}
+        to='/alerts'
       />
     </BottomNavigation>
   );

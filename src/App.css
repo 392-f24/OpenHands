@@ -6,8 +6,6 @@
 
 .content {
   flex: 1;
-  padding: 10px;
-  margin: auto;
   padding-bottom: 56px; /* Space for the bottom navigation */
-  max-width: 800px;
+  padding: 1rem;
 }
