@@ -18,6 +18,8 @@ export default [
     rules: {
       'unicorn/prevent-abbreviations': 'off',
       'unicorn/filename-case': 'off',
+      'unicorn/expiring-todo-comments': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
     },
   },
 ];
