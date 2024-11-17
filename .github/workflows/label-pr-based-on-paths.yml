@@ -47,7 +47,7 @@ jobs:
               if (file.filename.startsWith('src/hooks')) {
                 labels.add('hooks');
               }
-              if (file.filename.startsWith('src/utils'))) {
+              if (file.filename.startsWith('src/utils')) {
                 labels.add('utils');
               }
               if (file.filename.startsWith('src/context')) {

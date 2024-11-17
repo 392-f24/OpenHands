@@ -26,10 +26,11 @@
     "@fontsource/roboto": "^5.1.0",
     "@mui/icons-material": "^6.1.6",
     "@mui/material": "^6.1.6",
+    "es-toolkit": "^1.27.0",
     "firebase": "^11.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.27.0"
+    "react-router-dom": "^6.28.0"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.0",
