@@ -20,7 +20,7 @@ const getPageIndex = (path: string) => {
   }
 };
 
-export default function Footer() {
+const Footer = () => {
   const location = useLocation();
 
   return (
@@ -57,4 +57,5 @@ export default function Footer() {
       />
     </BottomNavigation>
   );
-}
+};
+export default Footer;

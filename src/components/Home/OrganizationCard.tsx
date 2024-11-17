@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -14,6 +13,8 @@ import {
 } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 
+import { useToggle } from '@/hooks';
+
 interface Organization {
   id: number;
   name: string;
@@ -27,14 +28,11 @@ interface Organization {
 const OrganizationCard: React.FC<{ organization: Organization }> = ({
   organization,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
-
-  const toggleExpand = () => setIsExpanded((prev) => !prev);
-  const toggleSave = () => setIsSaved((prev) => !prev);
+  const [isExpanded, toggleExpand] = useToggle();
+  const [isSaved, toggleSave] = useToggle();
 
   return (
-    <Card sx={{ marginBottom: 2 }}>
+    <Card sx={{ mb: 2 }}>
       <CardHeader
         title={organization.name}
         subheader={organization.location}

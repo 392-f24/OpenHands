@@ -1,7 +1,9 @@
-import { UserProvider } from '@/context/UserContext';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, test } from 'vitest';
+
 import App from './App';
+
+import { UserProvider } from '@/context/UserContext';
 
 describe('Check App Overall', () => {
   test('Should title', async () => {

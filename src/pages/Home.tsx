@@ -1,4 +1,5 @@
 import { Box } from '@mui/material';
+import { filter, lowerCase, some } from 'es-toolkit/compat';
 
 import OrganizationCard from '@/components/Home/OrganizationCard';
 
@@ -25,12 +26,12 @@ const Home = ({ searchQuery }: { searchQuery: string }) => {
   ];
 
   // Filtered organizations based on search query
-  const filteredOrganizations = organizations.filter((org) => {
-    const searchTerm = searchQuery.toLowerCase();
+  const filteredOrganizations = filter(organizations, (org) => {
+    const searchTerm = lowerCase(searchQuery);
     return (
-      org.name.toLowerCase().includes(searchTerm) ||
-      org.location.toLowerCase().includes(searchTerm) ||
-      org.needs.some((need) => need.toLowerCase().includes(searchTerm))
+      lowerCase(org.name).includes(searchTerm) ||
+      lowerCase(org.location).includes(searchTerm) ||
+      some(org.needs, (need) => lowerCase(need).includes(searchTerm))
     );
   });
 

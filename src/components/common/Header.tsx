@@ -1,5 +1,3 @@
-import ConfirmationDialog from '@/components/common/ConfirmationDialog';
-import useUser from '@/hooks/useUser';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
   AppBar,
@@ -13,6 +11,10 @@ import {
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import ConfirmationDialog from '@/components/common/ConfirmationDialog';
+
+import useUser from '@/hooks/useUser';
+
 const Header = () => {
   const { user } = useUser();
   const location = useLocation();
@@ -21,7 +23,7 @@ const Header = () => {
   // State for Dialog visibility
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 
-  const routesNotShowingBackButton = ['/', '/me'];
+  const routesNotShowingBackButton = ['/', '/saved', '/alerts'];
 
   // Show back button only on pages other than /
   const showBackButton = !routesNotShowingBackButton.includes(
