@@ -1,9 +1,11 @@
 import { Box } from '@mui/material';
 import { filter, lowerCase, some } from 'es-toolkit/compat';
+import { useState } from 'react';
 
+import { SearchBar } from '@/components/common';
 import OrganizationCard from '@/components/Home/OrganizationCard';
 
-const Home = ({ searchQuery }: { searchQuery: string }) => {
+const Home = () => {
   const organizations = [
     {
       id: 1,
@@ -25,6 +27,8 @@ const Home = ({ searchQuery }: { searchQuery: string }) => {
     },
   ];
 
+  const [searchQuery, setSearchQuery] = useState(''); // New state for search query
+
   // Filtered organizations based on search query
   const filteredOrganizations = filter(organizations, (org) => {
     const searchTerm = lowerCase(searchQuery);
@@ -36,14 +40,20 @@ const Home = ({ searchQuery }: { searchQuery: string }) => {
   });
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      {filteredOrganizations.map((org) => (
-        <OrganizationCard
-          organization={org}
-          key={org.id}
-        />
-      ))}
-    </Box>
+    <div>
+      <SearchBar
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
+      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+        {filteredOrganizations.map((org) => (
+          <OrganizationCard
+            organization={org}
+            key={org.id}
+          />
+        ))}
+      </Box>
+    </div>
   );
 };
 

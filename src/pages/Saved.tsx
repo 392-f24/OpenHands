@@ -19,9 +19,10 @@ const Saved = () => {
         ))
       ) : (
         <Typography
-          variant='body2'
+          variant='h5'
           color='text.secondary'
           align='center'
+          m={5}
         >
           No saved organizations.
         </Typography>
