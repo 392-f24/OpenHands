@@ -13,12 +13,18 @@ const loginUser = async (
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
+    if (!user.email) {
+      throw new Error('User email is not available.');
+    }
+
     const photoURL = user.photoURL ?? '';
     const displayName = user.displayName ?? '';
+    const email = user.email; // Extract the user's login email
 
     if (userType === 'donor') {
       const donorProfile = await getDonorProfile(
         user.uid,
+        email, // Pass the email
         photoURL,
         displayName
       );
@@ -27,6 +33,7 @@ const loginUser = async (
     } else {
       const organizationProfile = await getOrganizationProfile(
         user.uid,
+        email, // Pass the email
         photoURL,
         displayName
       );
