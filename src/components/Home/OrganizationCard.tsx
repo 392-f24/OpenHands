@@ -13,20 +13,13 @@ import {
 } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import { lighten, useTheme } from '@mui/material/styles';
+import { useState } from 'react';
 
 import { useToggle } from '@/hooks';
 
-import useSaved from '@/hooks/useSaved';
+import DonationModal from '@/components/common/DonationModal';
 
-interface Organization {
-  id: number;
-  name: string;
-  location: string;
-  description: string;
-  website: string;
-  needs: string[];
-  loanable: boolean;
-}
+import useSaved from '@/hooks/useSaved';
 
 const OrganizationCard: React.FC<{ organization: Organization }> = ({
   organization,
@@ -35,6 +28,24 @@ const OrganizationCard: React.FC<{ organization: Organization }> = ({
   const [isExpanded, toggleExpand] = useToggle();
   const { savedOrgs, toggleSavedOrg } = useSaved();
   const isSaved = savedOrgs.some((org) => org.id === organization.id);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [checkedItems, setCheckedItems] = useState<boolean[]>(
+    organization.needs.map(() => false) // initialize all items as unchecked
+  );
+
+  // Function to handle checkbox toggling
+  const handleCheckboxToggle = (index: number) => {
+    setCheckedItems((prevCheckedItems) => {
+      const newCheckedItems = [...prevCheckedItems];
+      newCheckedItems[index] = !newCheckedItems[index];
+      return newCheckedItems;
+    });
+  };
+
+  // Function to get the list of checked items
+  const getCheckedItems = () => {
+    return organization.needs.filter((_, index) => checkedItems[index]);
+  };
 
   return (
     <Card
@@ -77,7 +88,18 @@ const OrganizationCard: React.FC<{ organization: Organization }> = ({
           {isExpanded ? <ExpandLess /> : <ExpandMore />}
         </Button>
         {organization.loanable && <Button variant='outlined'>Loan</Button>}
-        <Button variant='contained'>Donate</Button>
+        <Button
+          variant='contained'
+          onClick={() => setModalOpen(true)}
+        >
+          Donate
+        </Button>
+        <DonationModal
+          open={isModalOpen}
+          onClose={() => setModalOpen(false)}
+          organization={organization}
+          selectedNeeds={getCheckedItems()}
+        />
       </CardActions>
       <Collapse
         in={isExpanded}
@@ -87,7 +109,10 @@ const OrganizationCard: React.FC<{ organization: Organization }> = ({
         <List>
           {organization.needs.map((need, index) => (
             <ListItem key={index}>
-              <Checkbox />
+              <Checkbox
+                checked={checkedItems[index]}
+                onChange={() => handleCheckboxToggle(index)}
+              />
               <ListItemText primary={need} />
             </ListItem>
           ))}

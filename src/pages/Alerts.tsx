@@ -35,6 +35,7 @@ const Alerts = () => {
 
   return (
     <Box>
+      <h1 style={{ marginLeft: '20px' }}>Alerts</h1>
       <Paper
         sx={{
           mt: 2,
@@ -42,13 +43,6 @@ const Alerts = () => {
           backgroundColor: lighten(theme.palette.primary.light, 0.8),
         }}
       >
-        <Typography
-          variant='h6'
-          align='center'
-        >
-          Alerts
-        </Typography>
-        <Divider sx={{ my: 1 }} />
         {alerts.length > 0 ? (
           <List>
             {alerts.map((alert) => (

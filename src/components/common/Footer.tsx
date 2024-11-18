@@ -1,4 +1,9 @@
-import { Home, Bookmark, Notifications } from '@mui/icons-material';
+import {
+  Home,
+  CalendarMonth,
+  Bookmark,
+  Notifications,
+} from '@mui/icons-material';
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -8,11 +13,14 @@ const getPageIndex = (path: string) => {
     case '/': {
       return 0;
     }
-    case '/saved': {
+    case '/schedule': {
       return 1;
     }
-    case '/alerts': {
+    case '/saved': {
       return 2;
+    }
+    case '/alerts': {
+      return 3;
     }
     default: {
       return 0;
@@ -42,6 +50,12 @@ const Footer = () => {
         icon={<Home />}
         component={Link}
         to='/'
+      />
+      <BottomNavigationAction
+        label='Schedule'
+        icon={<CalendarMonth />}
+        component={Link}
+        to='/schedule'
       />
       <BottomNavigationAction
         label='Saved'

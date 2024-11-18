@@ -23,7 +23,7 @@ const Header = () => {
   // State for Dialog visibility
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 
-  const routesNotShowingBackButton = ['/', '/saved', '/alerts'];
+  const routesNotShowingBackButton = ['/', '/schedule', '/saved', '/alerts'];
 
   // Show back button only on pages other than /
   const showBackButton = !routesNotShowingBackButton.includes(
