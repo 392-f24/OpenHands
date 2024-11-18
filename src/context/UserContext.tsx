@@ -6,6 +6,14 @@ import LoadingCircle from '@/components/common/LoadingCircle';
 
 import { loginUser, logoutUser, auth, updateDocument } from '@/utils/firebase';
 
+interface UserContextType {
+  user: User | undefined;
+  loading: boolean;
+  login: (userType: UserType, navigate: NavigateFunction) => Promise<void>;
+  logout: (navigate: NavigateFunction) => Promise<void>;
+  updateProfile: (updates: Partial<User>) => Promise<void>;
+}
+
 const UserContext = createContext<UserContextType>({} as UserContextType);
 
 const UserProvider = ({ children }: { children: React.ReactNode }) => {

@@ -1,18 +1,10 @@
-interface Organization {
-  id: number;
-  name: string;
-  location: string;
-  description: string;
-  website: string;
-  needs: string[];
-  loanable: boolean;
-  pickup: boolean;
-}
-
 interface ScheduledDonation {
   organizationName: string;
   organizationLocation: string;
-  items: string[];
+  supplies: {
+    itemName: string;
+    quantityProvided: number;
+  }[];
   time: string; // ISO timestamp
   method: string;
 }
