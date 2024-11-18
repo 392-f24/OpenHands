@@ -7,9 +7,9 @@ import {
   ListItem,
   ListItemText,
 } from '@mui/material';
-import { filter, lowerCase } from 'es-toolkit/compat';
+import { lighten, useTheme } from '@mui/material/styles';
 
-const Alerts = ({ searchQuery }: { searchQuery: string }) => {
+const Alerts = () => {
   const alerts = [
     {
       id: 1,
@@ -31,21 +31,16 @@ const Alerts = ({ searchQuery }: { searchQuery: string }) => {
     },
   ];
 
-  // Filter alerts based on the search query
-  const filteredAlerts = filter(alerts, (alert) => {
-    const searchTerm = lowerCase(searchQuery);
-    return (
-      lowerCase(alert.title).includes(searchTerm) ||
-      lowerCase(alert.message).includes(searchTerm) ||
-      lowerCase(alert.category).includes(searchTerm)
-    );
-  });
+  const theme = useTheme();
 
   return (
     <Box>
       <Paper
-        elevation={2}
-        sx={{ padding: 2, marginTop: 2 }}
+        sx={{
+          mt: 2,
+          mx: 2,
+          backgroundColor: lighten(theme.palette.primary.light, 0.8),
+        }}
       >
         <Typography
           variant='h6'
@@ -54,9 +49,9 @@ const Alerts = ({ searchQuery }: { searchQuery: string }) => {
           Alerts
         </Typography>
         <Divider sx={{ my: 1 }} />
-        {filteredAlerts.length > 0 ? (
+        {alerts.length > 0 ? (
           <List>
-            {filteredAlerts.map((alert) => (
+            {alerts.map((alert) => (
               <ListItem key={alert.id}>
                 <ListItemText
                   primary={alert.title}
@@ -67,7 +62,7 @@ const Alerts = ({ searchQuery }: { searchQuery: string }) => {
           </List>
         ) : (
           <Typography
-            variant='body2'
+            variant='h2'
             color='text.secondary'
             align='center'
           >

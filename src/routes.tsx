@@ -6,15 +6,11 @@ import Alerts from '@/pages/Alerts';
 
 import { ProtectedRoute } from '@/components/common';
 
-type AppRoutesProps = {
-  searchQuery: string;
-};
-
-const AppRoutes = ({ searchQuery }: AppRoutesProps) => {
+const AppRoutes = () => {
   const routeConfig = [
-    { path: '/', element: <Home searchQuery={searchQuery} /> },
+    { path: '/', element: <Home /> },
     { path: '/saved', element: <Saved /> },
-    { path: '/alerts', element: <Alerts searchQuery={searchQuery} /> },
+    { path: '/alerts', element: <Alerts /> },
   ];
 
   return (
