@@ -12,8 +12,11 @@ import {
   Typography,
 } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
+import { lighten, useTheme } from '@mui/material/styles';
 
 import { useToggle } from '@/hooks';
+
+import useSaved from '@/hooks/useSaved';
 
 interface Organization {
   id: number;
@@ -28,18 +31,26 @@ interface Organization {
 const OrganizationCard: React.FC<{ organization: Organization }> = ({
   organization,
 }) => {
+  const theme = useTheme();
   const [isExpanded, toggleExpand] = useToggle();
-  const [isSaved, toggleSave] = useToggle();
+  const { savedOrgs, toggleSavedOrg } = useSaved();
+  const isSaved = savedOrgs.some((org) => org.id === organization.id);
 
   return (
-    <Card sx={{ mb: 2 }}>
+    <Card
+      sx={{
+        mt: 2,
+        mx: 2,
+        backgroundColor: lighten(theme.palette.primary.light, 0.8),
+      }}
+    >
       <CardHeader
         title={organization.name}
         subheader={organization.location}
         action={
           <Button
             color={isSaved ? 'secondary' : 'primary'}
-            onClick={toggleSave}
+            onClick={() => toggleSavedOrg(organization)}
           >
             {isSaved ? 'Unsave' : 'Save'}
           </Button>
