@@ -55,6 +55,7 @@ const Header = () => {
             transform: 'translateX(-50%)',
             fontWeight: 600,
             fontSize: '1.4rem',
+            color: '#202020',
           }}
         >
           OpenHands
