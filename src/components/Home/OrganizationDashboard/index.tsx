@@ -8,13 +8,17 @@ import {
   ListItem,
   ListItemText,
   TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import { useState } from 'react';
 
 const OrganizationDashboard = () => {
-  const [organization] = useState({
+  const [organization, setOrganization] = useState({
     name: 'Community Food Pantry',
     description: 'Providing food for those in need.',
     location: 'City Center',
@@ -29,13 +33,27 @@ const OrganizationDashboard = () => {
   ]);
   const [newNeed, setNewNeed] = useState('');
   const [isAddingNeed, setIsAddingNeed] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editedProfile, setEditedProfile] = useState(organization);
 
+  // Handle adding a new need
   const handleAddNeed = () => {
     if (newNeed.trim()) {
-      setNeeds([...needs, newNeed.trim()]);
+      const updatedNeeds = [...needs, newNeed.trim()];
+      setNeeds(updatedNeeds);
       setNewNeed('');
       setIsAddingNeed(false);
+      // Save updated needs to the backend
+      console.log('Saved Needs:', updatedNeeds);
     }
+  };
+
+  // Handle saving the edited profile
+  const saveProfile = () => {
+    setOrganization(editedProfile);
+    setIsEditingProfile(false);
+    // Save updated profile to the backend
+    console.log('Saved Profile:', editedProfile);
   };
 
   return (
@@ -47,6 +65,7 @@ const OrganizationDashboard = () => {
         Organization&apos;s Profile
       </Typography>
 
+      {/* Profile Information */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Box
@@ -66,7 +85,7 @@ const OrganizationDashboard = () => {
               variant='outlined'
               color='primary'
               startIcon={<EditIcon />}
-              onClick={() => console.log('Edit profile button clicked!')}
+              onClick={() => setIsEditingProfile(true)}
             >
               Edit Profile
             </Button>
@@ -108,6 +127,7 @@ const OrganizationDashboard = () => {
         </CardContent>
       </Card>
 
+      {/* Current Needs */}
       <Card>
         <CardContent>
           <Typography
@@ -158,7 +178,7 @@ const OrganizationDashboard = () => {
             <Button
               startIcon={<AddIcon />}
               variant='contained'
-              color='secondary'
+              color='success' // Changed button color
               onClick={() => setIsAddingNeed(true)}
               sx={{ mt: 2 }}
             >
@@ -167,6 +187,75 @@ const OrganizationDashboard = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Profile Editing Dialog */}
+      <Dialog
+        open={isEditingProfile}
+        onClose={() => setIsEditingProfile(false)}
+      >
+        <DialogTitle>Edit Profile</DialogTitle>
+        <DialogContent>
+          <TextField
+            label='Name'
+            fullWidth
+            margin='dense'
+            value={editedProfile.name}
+            onChange={(e) =>
+              setEditedProfile((prev) => ({ ...prev, name: e.target.value }))
+            }
+          />
+          <TextField
+            label='Description'
+            fullWidth
+            margin='dense'
+            value={editedProfile.description}
+            onChange={(e) =>
+              setEditedProfile((prev) => ({
+                ...prev,
+                description: e.target.value,
+              }))
+            }
+          />
+          <TextField
+            label='Location'
+            fullWidth
+            margin='dense'
+            value={editedProfile.location}
+            onChange={(e) =>
+              setEditedProfile((prev) => ({
+                ...prev,
+                location: e.target.value,
+              }))
+            }
+          />
+          <TextField
+            label='Website'
+            fullWidth
+            margin='dense'
+            value={editedProfile.website}
+            onChange={(e) =>
+              setEditedProfile((prev) => ({
+                ...prev,
+                website: e.target.value,
+              }))
+            }
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setIsEditingProfile(false)}
+            color='secondary'
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={saveProfile}
+            color='primary'
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
