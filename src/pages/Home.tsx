@@ -36,7 +36,7 @@ const Home = ({ searchQuery }: { searchQuery: string }) => {
   });
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       {filteredOrganizations.map((org) => (
         <OrganizationCard
           organization={org}
