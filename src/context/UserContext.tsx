@@ -1,55 +1,90 @@
 import { createContext, useState, useEffect } from 'react';
-import type { User as FirebaseUser } from 'firebase/auth';
 import { onAuthStateChanged } from 'firebase/auth';
+import type { NavigateFunction } from 'react-router-dom';
 
 import LoadingCircle from '@/components/common/LoadingCircle';
 
-import { auth } from '@/utils/firebaseConfig';
+import { loginUser, logoutUser, auth, updateDocument } from '@/utils/firebase';
 
-interface User {
-  uid: string;
-  username: string;
-  profilePicture: string;
-}
-
-interface UserContext {
-  user: User | undefined;
-  loading: boolean;
-}
-
-const UserContext = createContext<UserContext>({} as UserContext);
+const UserContext = createContext<UserContextType>({} as UserContextType);
 
 const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | undefined>();
   const [loading, setLoading] = useState(true);
 
+  // Monitor auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      (firebaseUser: FirebaseUser | null) => {
-        if (firebaseUser) {
-          // Set the authenticated user's information
-          setUser({
-            uid: firebaseUser.uid,
-            username: firebaseUser.displayName || 'Anonymous',
-            profilePicture: firebaseUser.photoURL || '',
-          });
-        } else {
-          // No user is authenticated
-          setUser(undefined);
-        }
-        setLoading(false); // Authentication check is complete
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        // Already authenticated; we may fetch additional profile data if necessary
+        console.log('Authenticated:', firebaseUser.uid);
+      } else {
+        setUser(undefined); // Clear user state on logout
       }
-    );
+      setLoading(false); // Stop loading spinner
+    });
 
-    return () => unsubscribe(); // Clean up listener on component unmount
+    return () => unsubscribe();
   }, []);
 
+  // Handle login
+  const login = async (
+    userType: 'donor' | 'organization',
+    navigate: NavigateFunction
+  ): Promise<void> => {
+    try {
+      setLoading(true);
+      const profile = await loginUser(navigate, userType);
+      if (profile) {
+        setUser({
+          ...profile,
+          role: userType, // Attach user role
+        });
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      alert('Login failed. Please try again.');
+    }
+    setLoading(false);
+  };
+
+  // Handle logout
+  const logout = async (navigate: NavigateFunction): Promise<void> => {
+    try {
+      setLoading(true);
+      await logoutUser(navigate);
+      setUser(undefined); // Clear user state
+    } catch (error) {
+      console.error('Error during logout:', error);
+      alert('Logout failed. Please try again.');
+    }
+    setLoading(false);
+  };
+
+  // Handle profile update
+  const updateProfile = async (updates: Partial<User>): Promise<void> => {
+    if (!user) {
+      console.error('No user is currently logged in.');
+      return;
+    }
+
+    try {
+      const collectionName = user.role;
+      await updateDocument<User>(collectionName, user.uid, updates);
+      setUser((prev) => (prev ? { ...prev, ...updates } : undefined)); // Update local state
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Profile update failed. Please try again.');
+    }
+  };
+
   return (
-    <UserContext.Provider value={{ user, loading }}>
+    <UserContext.Provider
+      value={{ user, loading, login, logout, updateProfile }}
+    >
       {loading ? <LoadingCircle /> : children}
     </UserContext.Provider>
   );
 };
 
-export { UserContext, UserProvider };
+export { UserProvider, UserContext };

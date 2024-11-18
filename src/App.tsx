@@ -15,9 +15,9 @@ import { theme } from '@/utils/theme';
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
-      <EventsProvider>
-        <SavedProvider>
-          <UserProvider>
+      <UserProvider>
+        <EventsProvider>
+          <SavedProvider>
             <div className='App'>
               <Router
                 future={{
@@ -35,9 +35,9 @@ const App = () => {
                 <Footer />
               </Router>
             </div>
-          </UserProvider>
-        </SavedProvider>
-      </EventsProvider>
+          </SavedProvider>
+        </EventsProvider>
+      </UserProvider>
     </ThemeProvider>
   );
 };

@@ -1,11 +1,4 @@
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from '@mui/material';
+import CustomDialog from './CustomDialog';
 
 interface ConfirmationDialogProps {
   open: boolean;
@@ -23,41 +16,29 @@ const ConfirmationDialog = ({
   onClose,
   onConfirm,
   title,
-  description = '', // If null, no description will be shown
+  description = '',
   confirmText = 'Confirm',
   cancelText = 'Cancel',
-  confirmColor = 'error', // 'primary' or 'error'
+  confirmColor = 'error',
 }: ConfirmationDialogProps) => {
   return (
-    <Dialog
+    <CustomDialog
       open={open}
       onClose={onClose}
-      aria-describedby={
-        description ? 'confirmation-dialog-description' : undefined
-      }
-      aria-hidden={!open}
-      role='alertdialog'
-    >
-      <DialogTitle id='confirmation-dialog-title'>{title}</DialogTitle>
-      <DialogContent>
-        {description && (
-          <DialogContentText id='confirmation-dialog-description'>
-            {description}
-          </DialogContentText>
-        )}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>{cancelText}</Button>
-        <Button
-          onClick={onConfirm}
-          color={confirmColor}
-          // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus
-        >
-          {confirmText}
-        </Button>
-      </DialogActions>
-    </Dialog>
+      title={title}
+      description={description}
+      actions={[
+        {
+          text: cancelText,
+          onClick: onClose,
+        },
+        {
+          text: confirmText,
+          onClick: onConfirm,
+          color: confirmColor,
+        },
+      ]}
+    />
   );
 };
 

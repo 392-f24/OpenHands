@@ -8,60 +8,45 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { useUser } from '@/hooks';
+import { useToggle, useUser } from '@/hooks';
 
-import RoleSelectionModal from '@/components/RoleSelectionModal'; // For role selection
-import { ConfirmationDialog } from '@/components/common';
-
-import { handleLogin, handleSignOut } from '@/utils/auth'; // Login and sign-out functions
+import { CustomDialog, ConfirmationDialog } from '@/components/common';
 
 const Header = () => {
-  const { user, loading } = useUser();
+  const { user, login, logout } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
 
-  // State for Dialog visibility
-  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
-  const [openRoleDialog, setOpenRoleDialog] = useState(false);
+  // Dialog visibility state
+  const [confirmDialogOpen, toggleConfirmDialog] = useToggle();
+  const [roleDialogOpen, toggleRoleDialog] = useToggle();
 
-  const routesNotShowingBackButton = ['/', '/schedule', '/saved', '/alerts'];
-
-  // Show back button only on pages other than /
-  const showBackButton = !routesNotShowingBackButton.includes(
-    location.pathname
-  );
-  // Handle "Sign In" button click
-  const handleSignIn = () => {
-    setOpenRoleDialog(true); // Open role selection modal
-  };
-
-  // Handle role selection (Donor or Organization)
-  const handleRoleSelection = async (role: 'donor' | 'organization') => {
-    setOpenRoleDialog(false); // Close modal
-    await handleLogin(navigate, role); // Login and navigate to the appropriate dashboard
-  };
+  // Pages where the back button should not be shown
+  const routesWithoutBackButton = ['/', '/schedule', '/saved', '/alerts'];
+  const showBackButton = !routesWithoutBackButton.includes(location.pathname);
 
   return (
     <AppBar
       position='sticky'
-      sx={{ backgroundColor: 'primary.light', color: '#000' }}
+      sx={{ backgroundColor: 'primary.light' }}
     >
       <Toolbar sx={{ justifyContent: 'space-between', position: 'relative' }}>
+        {/* Back Button */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {showBackButton && (
             <IconButton
               edge='start'
               color='inherit'
-              onClick={() => navigate(-1)} // Back button
+              onClick={() => navigate(-1)}
             >
               <ArrowBackIcon />
             </IconButton>
           )}
         </Box>
 
+        {/* App Title */}
         <Typography
           variant='h6'
           sx={{
@@ -75,47 +60,45 @@ const Header = () => {
           OpenHands
         </Typography>
 
+        {/* User Section */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {loading ? (
-            <Typography>Loading...</Typography> // Show while checking auth state
-          ) : user ? (
+          {user ? (
             <>
-              {/* Avatar and Sign-Out */}
+              {/* User Avatar */}
               <IconButton
                 edge='end'
                 color='inherit'
-                onClick={() => setOpenConfirmDialog(true)}
+                onClick={toggleConfirmDialog}
               >
                 <Avatar
-                  alt={`${user.username}'s profile picture`}
-                  src={user.profilePicture}
+                  alt={`${user.name}'s profile picture`}
+                  src={user.profilePic}
                 >
-                  {user.username
-                    .split(' ')
+                  {user.name
+                    ?.split(' ')
                     .slice(0, 2)
-                    .map((word) => word[0])}
+                    .map((word) => word[0])
+                    .join('') || 'U'}
                 </Avatar>
               </IconButton>
 
-              {/* Dialog for Confirm Sign Out */}
+              {/* Sign-Out Confirmation Dialog */}
               <ConfirmationDialog
-                open={openConfirmDialog}
-                onClose={() => setOpenConfirmDialog(false)}
+                open={confirmDialogOpen}
+                onClose={toggleConfirmDialog}
                 onConfirm={async () => {
-                  setOpenConfirmDialog(false);
-                  // await handleSignOut();
-                  await handleSignOut(navigate);
+                  await logout(navigate);
+                  toggleConfirmDialog();
                 }}
-                title='Confirm Sign Out'
+                title='Sign Out'
                 description='Are you sure you want to sign out?'
-                confirmText='Sign Out'
               />
             </>
           ) : (
             // Sign-In Button
             <Button
               color='inherit'
-              onClick={handleSignIn}
+              onClick={toggleRoleDialog}
             >
               Sign In
             </Button>
@@ -123,11 +106,28 @@ const Header = () => {
         </Box>
       </Toolbar>
 
-      {/* Role Selection Modal */}
-      <RoleSelectionModal
-        open={openRoleDialog}
-        onClose={() => setOpenRoleDialog(false)}
-        onSelectRole={handleRoleSelection}
+      {/* Role Selection Dialog */}
+      <CustomDialog
+        open={roleDialogOpen}
+        onClose={toggleRoleDialog}
+        title='Select Role'
+        description='Please select your role to proceed.'
+        actions={[
+          {
+            text: 'Donor',
+            onClick: async () => {
+              await login('donor', navigate);
+              toggleRoleDialog();
+            },
+          },
+          {
+            text: 'Organization',
+            onClick: async () => {
+              await login('organization', navigate);
+              toggleRoleDialog();
+            },
+          },
+        ]}
       />
     </AppBar>
   );

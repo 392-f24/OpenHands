@@ -18,9 +18,17 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Splitting react and mui into separate chunks
           react: ['react', 'react-dom'],
-          mui: ['@mui/material'],
+          mui: [
+            '@mui/material',
+            '@mui/icons-material',
+            '@mui/lab',
+            '@mui/x-date-pickers',
+          ],
+          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+          dateFns: ['date-fns'],
+          bigCalendar: ['react-big-calendar'],
+          moment: ['moment'],
         },
       },
     },
