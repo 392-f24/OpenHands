@@ -1,20 +1,54 @@
+import type { User } from 'firebase/auth';
+import type { NavigateFunction } from 'react-router-dom';
+
 import { getOrCreateDocument } from './firebaseUtils';
+
+const getUserProfile = async (
+  user: User,
+  role: 'donor' | 'organization',
+  navigate: NavigateFunction
+): Promise<DonorProfile | OrganizationProfile | undefined> => {
+  const { uid, email, photoURL, displayName } = user;
+
+  const userProfile =
+    role === 'donor'
+      ? getDonorProfile(
+          uid,
+          email as string,
+          photoURL as string,
+          displayName as string
+        )
+      : getOrganizationProfile(
+          uid,
+          email as string,
+          photoURL as string,
+          displayName as string
+        );
+
+  if (role === 'donor' || !userProfile) {
+    navigate('/');
+  } else if (role === 'organization') {
+    navigate('/organization-dashboard');
+  }
+
+  return userProfile;
+};
 
 const getDonorProfile = async (
   uid: string,
   email: string, // Login email from authentication
-  photoURL?: string,
-  displayName?: string
+  photoURL: string,
+  displayName: string
 ): Promise<DonorProfile | undefined> => {
   const defaultProfile: DonorProfile = {
     uid,
-    name: displayName || '',
+    name: displayName,
     email, // Store the login email
-    profilePic: photoURL || '',
+    profilePic: photoURL,
     createdAt: new Date(),
     role: 'donor',
-    joinedEvents: [], // Initialize as an empty array for joined event IDs
-    providedSupplies: [], // Initialize as an empty array for provided supplies
+    joinedEvents: [], // Initialize empty array
+    providedSupplies: [], // Initialize empty array
   };
 
   return getOrCreateDocument<DonorProfile>('users', uid, defaultProfile);
@@ -23,23 +57,20 @@ const getDonorProfile = async (
 const getOrganizationProfile = async (
   uid: string,
   email: string, // Login email for the organization
-  photoURL?: string,
-  displayName?: string,
-  location?: string,
-  description?: string,
-  website?: string
+  photoURL: string,
+  displayName: string
 ): Promise<OrganizationProfile | undefined> => {
   const defaultProfile: OrganizationProfile = {
     uid,
-    name: displayName || '',
+    name: displayName,
     email, // Store the login email
-    profilePic: photoURL || '',
+    profilePic: photoURL,
     createdAt: new Date(),
     role: 'organization',
-    location: location || '', // Default to an empty string if not provided
-    description: description || '', // Default to an empty string if not provided
-    website: website || '', // Default to an empty string if not provided
-    events: [], // Initialize as an empty array for events
+    location: '', // Default empty string
+    description: '', // Default empty string
+    website: '', // Default empty string
+    events: [], // Initialize empty array
   };
 
   return getOrCreateDocument<OrganizationProfile>(
@@ -49,4 +80,4 @@ const getOrganizationProfile = async (
   );
 };
 
-export { getDonorProfile, getOrganizationProfile };
+export default getUserProfile;

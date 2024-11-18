@@ -6,7 +6,12 @@ import {
   DialogTitle,
   Button,
 } from '@mui/material';
-import React from 'react';
+
+interface DialogAction {
+  text: string;
+  onClick: () => void;
+  color?: 'primary' | 'error' | 'secondary' | 'inherit';
+}
 
 interface CustomDialogProps {
   open: boolean;

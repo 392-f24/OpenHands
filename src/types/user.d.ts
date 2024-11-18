@@ -33,7 +33,7 @@ interface OrganizationProfile extends BasicProfile {
       quantityNeeded: number;
       quantityProvided: number;
       providedBy: string[]; // array of uid of donors
-      status: 'needed' | 'fulfilled';
+      status: boolean; // true if provided
     }[];
   }[];
 }

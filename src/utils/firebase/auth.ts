@@ -1,7 +1,7 @@
 import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import type { NavigateFunction } from 'react-router-dom';
 
-import { getDonorProfile, getOrganizationProfile } from './userProfile';
+import getUserProfile from './userProfile';
 import { auth } from './firebaseConfig';
 
 const loginUser = async (
@@ -11,35 +11,9 @@ const loginUser = async (
   try {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
-    const user = result.user;
 
-    if (!user.email) {
-      throw new Error('User email is not available.');
-    }
-
-    const photoURL = user.photoURL ?? '';
-    const displayName = user.displayName ?? '';
-    const email = user.email; // Extract the user's login email
-
-    if (userType === 'donor') {
-      const donorProfile = await getDonorProfile(
-        user.uid,
-        email, // Pass the email
-        photoURL,
-        displayName
-      );
-      navigate('/');
-      return donorProfile;
-    } else {
-      const organizationProfile = await getOrganizationProfile(
-        user.uid,
-        email, // Pass the email
-        photoURL,
-        displayName
-      );
-      navigate('/organization-dashboard');
-      return organizationProfile;
-    }
+    const userProfile = await getUserProfile(result.user, userType, navigate);
+    return userProfile;
   } catch (error) {
     console.error('Error during login:', error);
     return undefined;
