@@ -14,17 +14,6 @@ import { useEvents } from '@/hooks';
 
 import { MessageDialog } from '@/components/common';
 
-interface DonationModalProps {
-  open: boolean;
-  onClose: () => void;
-  organization: {
-    name: string;
-    location: string;
-    pickup: boolean;
-  };
-  selectedNeeds: string[];
-}
-
 const DonationModal: React.FC<DonationModalProps> = ({
   open,
   onClose,

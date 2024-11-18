@@ -8,45 +8,46 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { useToggle, useUser } from '@/hooks';
+import { useUser } from '@/hooks';
 
-import { CustomDialog, ConfirmationDialog } from '@/components/common';
+import { ConfirmationDialog } from '@/components/common';
 
 const Header = () => {
-  const { user, login, logout } = useUser();
+  const { user } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Dialog visibility state
-  const [confirmDialogOpen, toggleConfirmDialog] = useToggle();
-  const [roleDialogOpen, toggleRoleDialog] = useToggle();
+  // State for Dialog visibility
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 
-  // Pages where the back button should not be shown
-  const routesWithoutBackButton = ['/', '/schedule', '/saved', '/alerts'];
-  const showBackButton = !routesWithoutBackButton.includes(location.pathname);
+  const routesNotShowingBackButton = ['/', '/schedule', '/saved', '/alerts'];
+
+  // Show back button only on pages other than /
+  const showBackButton = !routesNotShowingBackButton.includes(
+    location.pathname
+  );
 
   return (
     <AppBar
       position='sticky'
-      sx={{ backgroundColor: 'primary.light' }}
+      sx={{ backgroundColor: 'primary.light', color: '#000' }}
     >
       <Toolbar sx={{ justifyContent: 'space-between', position: 'relative' }}>
-        {/* Back Button */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {showBackButton && (
             <IconButton
               edge='start'
               color='inherit'
-              onClick={() => navigate(-1)}
+              onClick={() => navigate(-1)} // Back button
             >
               <ArrowBackIcon />
             </IconButton>
           )}
         </Box>
 
-        {/* App Title */}
         <Typography
           variant='h6'
           sx={{
@@ -60,75 +61,53 @@ const Header = () => {
           OpenHands
         </Typography>
 
-        {/* User Section */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {user ? (
             <>
-              {/* User Avatar */}
               <IconButton
                 edge='end'
                 color='inherit'
-                onClick={toggleConfirmDialog}
+                onClick={() => setOpenConfirmDialog(true)}
+                aria-label='sign out'
               >
                 <Avatar
-                  alt={`${user.name}'s profile picture`}
-                  src={user.profilePic}
+                  alt={`${user.username} profile picture`}
+                  src={user.profilePicture}
+                  aria-label='profile picture'
                 >
-                  {user.name
-                    ?.split(' ')
+                  {/* Use username Initials of first 2 words */}
+                  {user.username
+                    .split(' ')
                     .slice(0, 2)
-                    .map((word) => word[0])
-                    .join('') || 'U'}
+                    .map((word) => word[0])}
                 </Avatar>
               </IconButton>
 
-              {/* Sign-Out Confirmation Dialog */}
+              {/* Dialog for Confirm Sign Out */}
               <ConfirmationDialog
-                open={confirmDialogOpen}
-                onClose={toggleConfirmDialog}
+                open={openConfirmDialog}
+                onClose={() => setOpenConfirmDialog(false)}
                 onConfirm={async () => {
-                  await logout(navigate);
-                  toggleConfirmDialog();
+                  setOpenConfirmDialog(false);
+                  // await handleSignOut();
+                  navigate('/');
                 }}
-                title='Sign Out'
+                title='Confirm Sign Out'
                 description='Are you sure you want to sign out?'
+                confirmText='Sign Out'
               />
             </>
           ) : (
-            // Sign-In Button
             <Button
               color='inherit'
-              onClick={toggleRoleDialog}
+              // onClick={handleSignIn}
+              aria-label='sign in'
             >
               Sign In
             </Button>
           )}
         </Box>
       </Toolbar>
-
-      {/* Role Selection Dialog */}
-      <CustomDialog
-        open={roleDialogOpen}
-        onClose={toggleRoleDialog}
-        title='Select Role'
-        description='Please select your role to proceed.'
-        actions={[
-          {
-            text: 'Donor',
-            onClick: async () => {
-              await login('donor', navigate);
-              toggleRoleDialog();
-            },
-          },
-          {
-            text: 'Organization',
-            onClick: async () => {
-              await login('organization', navigate);
-              toggleRoleDialog();
-            },
-          },
-        ]}
-      />
     </AppBar>
   );
 };
