@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import { createContext, useState } from 'react';
 
 interface Organization {
   id: number;
@@ -17,9 +17,7 @@ interface SavedContextProps {
 
 const SavedContext = createContext<SavedContextProps | undefined>(undefined);
 
-const SavedProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+const SavedProvider = ({ children }: { children: React.ReactNode }) => {
   const [savedOrgs, setSavedOrgs] = useState<Organization[]>([]);
 
   const toggleSavedOrg = (org: Organization) => {

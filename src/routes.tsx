@@ -13,7 +13,7 @@ type AppRoutesProps = {
 const AppRoutes = ({ searchQuery }: AppRoutesProps) => {
   const routeConfig = [
     { path: '/', element: <Home searchQuery={searchQuery} /> },
-    { path: '/saved', element: <Saved searchQuery={searchQuery} /> },
+    { path: '/saved', element: <Saved /> },
     { path: '/alerts', element: <Alerts searchQuery={searchQuery} /> },
   ];
 
