@@ -30,7 +30,7 @@ const Header = () => {
   return (
     <AppBar
       position='sticky'
-      sx={{ backgroundColor: 'primary.light' }}
+      sx={{ backgroundColor: 'primary.light', color: '#000' }}
     >
       <Toolbar sx={{ justifyContent: 'space-between', position: 'relative' }}>
         {/* Back Button */}
