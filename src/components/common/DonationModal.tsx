@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Modal,
   Box,
@@ -10,9 +10,9 @@ import {
   TextField,
 } from '@mui/material';
 
-import MessageDialog from '@/components/common/MessageDialog';
+import { useEvents } from '@/hooks';
 
-import useEvents from '@/hooks/useEvents';
+import { MessageDialog } from '@/components/common';
 
 const DonationModal: React.FC<DonationModalProps> = ({
   open,

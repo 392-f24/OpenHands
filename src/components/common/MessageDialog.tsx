@@ -1,4 +1,3 @@
-import React from 'react';
 import { Dialog, DialogContent, DialogActions, Button } from '@mui/material';
 
 interface MessageDialogProps {

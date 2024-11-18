@@ -1,8 +1,8 @@
 import { Box, Typography } from '@mui/material';
 
-import SavedOrganizationCard from '@/components/Home/SavedCard';
+import { useSaved } from '@/hooks';
 
-import useSaved from '@/hooks/useSaved';
+import SavedOrganizationCard from '@/components/Home/SavedCard';
 
 const Saved = () => {
   const { savedOrgs, toggleSavedOrg } = useSaved();

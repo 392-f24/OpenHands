@@ -13,13 +13,11 @@ import {
 } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import { lighten, useTheme } from '@mui/material/styles';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { useToggle } from '@/hooks';
+import { useToggle, useSaved } from '@/hooks';
 
-import DonationModal from '@/components/common/DonationModal';
-
-import useSaved from '@/hooks/useSaved';
+import { DonationModal } from '@/components/common';
 
 const OrganizationCard: React.FC<{ organization: Organization }> = ({
   organization,
@@ -28,10 +26,9 @@ const OrganizationCard: React.FC<{ organization: Organization }> = ({
   const [isExpanded, toggleExpand] = useToggle();
   const { savedOrgs, toggleSavedOrg } = useSaved();
   const isSaved = savedOrgs.some((org) => org.id === organization.id);
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [checkedItems, setCheckedItems] = useState<boolean[]>(
-    organization.needs.map(() => false) // initialize all items as unchecked
-  );
+  const [isModalOpen, toggleModal] = useToggle();
+  const [checkedItems, setCheckedItems] = useState<boolean[]>([]);
+  const [checkedItemsList, setCheckedItemsList] = useState<string[]>([]);
 
   // Function to handle checkbox toggling
   const handleCheckboxToggle = (index: number) => {
@@ -42,10 +39,16 @@ const OrganizationCard: React.FC<{ organization: Organization }> = ({
     });
   };
 
-  // Function to get the list of checked items
-  const getCheckedItems = () => {
-    return organization.needs.filter((_, index) => checkedItems[index]);
-  };
+  useEffect(() => {
+    setCheckedItems(organization.needs.map(() => false));
+  }, [organization.needs]);
+
+  useEffect(() => {
+    const checked = organization.needs.filter(
+      (_, index) => checkedItems[index]
+    );
+    setCheckedItemsList(checked);
+  }, [checkedItems, organization.needs]);
 
   return (
     <Card
@@ -90,15 +93,15 @@ const OrganizationCard: React.FC<{ organization: Organization }> = ({
         {organization.loanable && <Button variant='outlined'>Loan</Button>}
         <Button
           variant='contained'
-          onClick={() => setModalOpen(true)}
+          onClick={toggleModal}
         >
           Donate
         </Button>
         <DonationModal
           open={isModalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={toggleModal}
           organization={organization}
-          selectedNeeds={getCheckedItems()}
+          selectedNeeds={checkedItemsList}
         />
       </CardActions>
       <Collapse

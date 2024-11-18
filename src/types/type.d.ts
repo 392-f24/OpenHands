@@ -15,13 +15,20 @@ interface Organization {
   pickup: boolean;
 }
 
-// interface ScheduledDonation {
-//   organizationName: string;
-//   organizationLocation: string;
-//   items: string[];
-//   time: string;
-//   method: string;
-// }
+interface ScheduledDonation {
+  organizationName: string;
+  organizationLocation: string;
+  items: string[];
+  time: string; // ISO timestamp
+  method: string;
+}
+
+type CalendarEvent = {
+  title: string;
+  start: Date;
+  end: Date;
+  donationDetails: ScheduledDonation;
+};
 
 interface DonationModalProps {
   open: boolean;

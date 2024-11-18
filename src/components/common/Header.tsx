@@ -11,9 +11,9 @@ import {
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import ConfirmationDialog from '@/components/common/ConfirmationDialog';
+import { useUser } from '@/hooks';
 
-import useUser from '@/hooks/useUser';
+import { ConfirmationDialog } from '@/components/common';
 
 const Header = () => {
   const { user } = useUser();

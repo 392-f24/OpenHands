@@ -10,18 +10,20 @@ import {
   Button,
 } from '@mui/material';
 
-import useEvents from '@/hooks/useEvents';
+import { useEvents, useToggle } from '@/hooks';
 
 // Set the localizer to use moment.js
 const localizer = momentLocalizer(moment); // Create localizer using moment
 
 const Schedule = () => {
-  const { events } = useEvents();
-  const [selectedEvent, setSelectedEvent] = useState<any | null>(null); // For the modal event details
-  const [open, setOpen] = useState(false); // Modal open/close state
+  const { events }: { events: ScheduledDonation[] } = useEvents();
+  const [selectedEvent, setSelectedEvent] = useState<ScheduledDonation | null>(
+    null
+  ); // For the modal event details
+  const [open, toggleOpen] = useToggle(false);
 
   // Convert ScheduledDonation to a calendar event format
-  const calendarEvents = events.map((donation) => ({
+  const calendarEvents: CalendarEvent[] = events.map((donation) => ({
     title: `${donation.organizationName}`,
     start: new Date(donation.time), // Convert string time to Date object
     end: new Date(new Date(donation.time).getTime() + 30 * 60 * 1000),
@@ -29,14 +31,14 @@ const Schedule = () => {
   }));
 
   // Event click handler to open the modal
-  const handleEventClick = (event: any) => {
+  const handleEventClick = (event: CalendarEvent) => {
     setSelectedEvent(event.donationDetails); // Set the selected event's details
-    setOpen(true); // Open the modal
+    toggleOpen();
   };
 
   // Handle closing the modal
   const handleClose = () => {
-    setOpen(false); // Close the modal
+    toggleOpen();
     setSelectedEvent(null); // Clear selected event data
   };
 
@@ -72,7 +74,7 @@ const Schedule = () => {
               </p>
               <p>
                 <strong>Time:</strong>{' '}
-                {new Date(selectedEvent.time).toLocaleString()}
+                {moment(selectedEvent.time).format('MMMM Do YYYY, h:mm a')}
               </p>
               <p>
                 <strong>Method:</strong> {selectedEvent.method}

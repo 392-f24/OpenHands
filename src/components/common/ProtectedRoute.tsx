@@ -1,9 +1,9 @@
 import { Typography } from '@mui/material';
 import type { ReactElement } from 'react';
 
-import LoadingCircle from '@/components/common/LoadingCircle';
+import { useUser } from '@/hooks';
 
-import useUser from '@/hooks/useUser';
+import LoadingCircle from '@/components/common/LoadingCircle';
 
 type ProtectedRouteProps = {
   element: ReactElement;
