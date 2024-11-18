@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 
-import { UserContest } from '@/context/UserContext';
+import { UserContext } from '@/context/UserContext';
 
-const useUser = () => useContext(UserContest);
+const useUser = () => useContext(UserContext);
 
 export default useUser;

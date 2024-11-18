@@ -1,9 +1,3 @@
-type User = {
-  uid: string;
-  username: string;
-  profilePicture: string;
-};
-
 interface Organization {
   id: number;
   name: string;
@@ -29,14 +23,3 @@ type CalendarEvent = {
   end: Date;
   donationDetails: ScheduledDonation;
 };
-
-interface DonationModalProps {
-  open: boolean;
-  onClose: () => void;
-  organization: {
-    name: string;
-    location: string;
-    pickup: boolean;
-  };
-  selectedNeeds: string[];
-}
