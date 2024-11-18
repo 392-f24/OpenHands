@@ -3,11 +3,11 @@ import '@/App.css';
 import { ThemeProvider } from '@mui/material';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-import { Header, Footer } from './components/common';
-
 import { UserProvider } from '@/context/UserContext';
 import { SavedProvider } from '@/context/SavedContext';
 import AppRoutes from '@/routes';
+
+import { Header, Footer } from '@/components/common';
 
 import { theme } from '@/utils/theme';
 
