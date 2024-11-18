@@ -4,6 +4,7 @@ import Home from '@/pages/Home';
 import Schedule from '@/pages/Schedule';
 import Saved from '@/pages/Saved';
 import Alerts from '@/pages/Alerts';
+import OrganizationDashboard from '@/pages/OrganizationDashboard';
 
 import { ProtectedRoute } from '@/components/common';
 
@@ -13,6 +14,7 @@ const AppRoutes = () => {
     { path: '/schedule', element: <Schedule /> },
     { path: '/saved', element: <Saved /> },
     { path: '/alerts', element: <Alerts /> },
+    { path: '/organization-dashboard', element: <OrganizationDashboard /> },
   ];
 
   return (
