@@ -11,9 +11,9 @@ import {
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import ConfirmationDialog from '@/components/common/ConfirmationDialog';
+import { useUser } from '@/hooks';
 
-import useUser from '@/hooks/useUser';
+import { ConfirmationDialog } from '@/components/common';
 
 const Header = () => {
   const { user } = useUser();
@@ -23,7 +23,7 @@ const Header = () => {
   // State for Dialog visibility
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 
-  const routesNotShowingBackButton = ['/', '/saved', '/alerts'];
+  const routesNotShowingBackButton = ['/', '/schedule', '/saved', '/alerts'];
 
   // Show back button only on pages other than /
   const showBackButton = !routesNotShowingBackButton.includes(

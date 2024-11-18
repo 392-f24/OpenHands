@@ -15,6 +15,7 @@ const Home = () => {
       website: 'https://example.com',
       needs: ['Bread', 'Canned Soup', 'Boxed Pasta', 'Fresh Vegetables'],
       loanable: false,
+      pickup: true,
     },
     {
       id: 2,
@@ -24,6 +25,7 @@ const Home = () => {
       website: 'https://example.com',
       needs: ['Costumes', 'Props'],
       loanable: true,
+      pickup: false,
     },
   ];
 

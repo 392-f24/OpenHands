@@ -1,14 +1,15 @@
 import { Box, Typography } from '@mui/material';
 
-import SavedOrganizationCard from '@/components/Home/SavedCard';
+import { useSaved } from '@/hooks';
 
-import useSaved from '@/hooks/useSaved';
+import SavedOrganizationCard from '@/components/Home/SavedCard';
 
 const Saved = () => {
   const { savedOrgs, toggleSavedOrg } = useSaved();
 
   return (
     <Box>
+      <h1 style={{ marginLeft: '20px' }}>Saved Organizations</h1>
       {savedOrgs.length > 0 ? (
         savedOrgs.map((org) => (
           <SavedOrganizationCard
@@ -19,12 +20,12 @@ const Saved = () => {
         ))
       ) : (
         <Typography
-          variant='h5'
+          variant='body1'
           color='text.secondary'
-          align='center'
           m={5}
         >
-          No saved organizations.
+          No currently saved organizations. Save an organization on the home
+          page.
         </Typography>
       )}
     </Box>

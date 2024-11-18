@@ -1,15 +1,5 @@
 import { createContext, useState } from 'react';
 
-interface Organization {
-  id: number;
-  name: string;
-  location: string;
-  description: string;
-  website: string;
-  needs: string[];
-  loanable: boolean;
-}
-
 interface SavedContextProps {
   savedOrgs: Organization[];
   toggleSavedOrg: (org: Organization) => void;
