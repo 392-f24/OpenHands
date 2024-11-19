@@ -5,6 +5,7 @@ import type { NavigateFunction } from 'react-router-dom';
 import LoadingCircle from '@/components/common/LoadingCircle';
 
 import { loginUser, logoutUser, auth, updateDocument } from '@/utils/firebase';
+import getUserProfile from '@/utils/firebase/userProfile';
 
 interface UserContextType {
   user: User | undefined;
@@ -17,19 +18,33 @@ interface UserContextType {
 const UserContext = createContext<UserContextType>({} as UserContextType);
 
 const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | undefined>();
+  const [user, setUser] = useState<User | undefined>(() => {
+    // Load user from localStorage on initial load
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : undefined;
+  });
   const [loading, setLoading] = useState(true);
 
   // Monitor auth state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        // Already authenticated; we may fetch additional profile data if necessary
-        console.log('Authenticated:', firebaseUser.uid);
+        if (!user) {
+          // Only fetch if the user is not already loaded
+          const role = localStorage.getItem('userRole') as UserType;
+          const profile = await getUserProfile(firebaseUser, role, () => {});
+          if (profile) {
+            const updatedUser = { ...profile, uid: firebaseUser.uid, role };
+            setUser(updatedUser);
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+          }
+        }
       } else {
-        setUser(undefined); // Clear user state on logout
+        setUser(undefined);
+        localStorage.removeItem('user');
+        localStorage.removeItem('userRole');
       }
-      setLoading(false); // Stop loading spinner
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -37,17 +52,17 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Handle login
   const login = async (
-    userType: 'donor' | 'organization',
+    userType: UserType,
     navigate: NavigateFunction
   ): Promise<void> => {
     try {
       setLoading(true);
+      localStorage.setItem('userRole', userType); // Save role to localStorage
       const profile = await loginUser(navigate, userType);
       if (profile) {
-        setUser({
-          ...profile,
-          role: userType, // Attach user role
-        });
+        const updatedUser = { ...profile, role: userType };
+        setUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
       }
     } catch (error) {
       console.error('Error during login:', error);
@@ -61,7 +76,9 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setLoading(true);
       await logoutUser(navigate);
-      setUser(undefined); // Clear user state
+      setUser(undefined);
+      localStorage.removeItem('user');
+      localStorage.removeItem('userRole');
     } catch (error) {
       console.error('Error during logout:', error);
       alert('Logout failed. Please try again.');
@@ -79,7 +96,9 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const collectionName = user.role;
       await updateDocument<User>(collectionName, user.uid, updates);
-      setUser((prev) => (prev ? { ...prev, ...updates } : undefined)); // Update local state
+      const updatedUser = { ...user, ...updates };
+      setUser(updatedUser); // Update local state
+      localStorage.setItem('user', JSON.stringify(updatedUser)); // Persist to localStorage
     } catch (error) {
       console.error('Error updating profile:', error);
       alert('Profile update failed. Please try again.');
