@@ -9,8 +9,9 @@ import {
   Typography,
 } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useToggle } from '@zl-asica/react';
 
-import { useToggle, useUser } from '@/hooks';
+import { useUser } from '@/hooks';
 
 import { CustomDialog, ConfirmationDialog } from '@/components/common';
 

@@ -14,8 +14,9 @@ import {
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import { lighten, useTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
+import { useToggle } from '@zl-asica/react';
 
-import { useToggle, useSaved } from '@/hooks';
+import { useSaved } from '@/hooks';
 
 import { DonationModal } from '@/components/common';
 
@@ -45,7 +46,7 @@ const OrganizationCard: React.FC<{ organization: Organization }> = ({
 
   useEffect(() => {
     const checked = organization.needs.filter(
-      (_, index) => checkedItems[index]
+      (_: string, index: number) => checkedItems[index]
     );
     setCheckedItemsList(checked);
   }, [checkedItems, organization.needs]);
@@ -110,7 +111,7 @@ const OrganizationCard: React.FC<{ organization: Organization }> = ({
         unmountOnExit
       >
         <List>
-          {organization.needs.map((need, index) => (
+          {organization.needs.map((need: string, index: number) => (
             <ListItem key={index}>
               <Checkbox
                 checked={checkedItems[index]}

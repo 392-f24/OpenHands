@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import type { NavigateFunction } from 'react-router-dom';
+import { useLocalStorage } from '@zl-asica/react';
 
 import LoadingCircle from '@/components/common/LoadingCircle';
 
@@ -17,15 +18,22 @@ interface UserContextType {
 const UserContext = createContext<UserContextType>({} as UserContextType);
 
 const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | undefined>();
+  const { value: user, setValue: setUser } = useLocalStorage<User | undefined>(
+    'user',
+    // eslint-disable-next-line
+    undefined
+  );
   const [loading, setLoading] = useState(true);
 
   // Monitor auth state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        // Already authenticated; we may fetch additional profile data if necessary
-        console.log('Authenticated:', firebaseUser.uid);
+        if (!user) {
+          // if user logged in but not in local storage
+          // clear user and let the user login again
+          setUser(undefined);
+        }
       } else {
         setUser(undefined); // Clear user state on logout
       }

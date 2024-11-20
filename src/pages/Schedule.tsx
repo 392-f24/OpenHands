@@ -9,8 +9,9 @@ import {
   DialogTitle,
   Button,
 } from '@mui/material';
+import { useToggle } from '@zl-asica/react';
 
-import { useEvents, useToggle } from '@/hooks';
+import { useEvents } from '@/hooks';
 
 // Set the localizer to use moment.js
 const localizer = momentLocalizer(moment); // Create localizer using moment
@@ -20,7 +21,7 @@ const Schedule = () => {
   const [selectedEvent, setSelectedEvent] = useState<ScheduledDonation | null>(
     null
   ); // For the modal event details
-  const [open, toggleOpen] = useToggle(false);
+  const [open, toggleOpen] = useToggle();
 
   // Convert ScheduledDonation to a calendar event format
   const calendarEvents: CalendarEvent[] = events.map((donation) => ({
