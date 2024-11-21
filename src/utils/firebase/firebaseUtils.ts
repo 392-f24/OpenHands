@@ -1,11 +1,5 @@
 import type { DocumentData, WithFieldValue } from 'firebase/firestore';
-import {
-  collection,
-  doc,
-  getDoc,
-  setDoc,
-  onSnapshot,
-} from 'firebase/firestore';
+import { collection, doc, getDoc, setDoc, getDocs } from 'firebase/firestore';
 
 import { db } from './firebaseConfig';
 
@@ -18,10 +12,11 @@ import { db } from './firebaseConfig';
  * @returns The existing or newly created document data.
  */
 const getOrCreateDocument = async <T extends WithFieldValue<DocumentData>>(
-  collectionName: string,
   uid: string,
   defaultData: T
 ): Promise<T | undefined> => {
+  const collectionName = defaultData.role;
+
   try {
     const docRef = doc(db, collectionName, uid);
     const docSnap = await getDoc(docRef);
@@ -63,37 +58,32 @@ const updateDocument = async <T>(
 };
 
 /**
- * Listen to all organization profiles in Firestore.
+ * Fetch all organization profiles in Firestore.
  *
- * @param callback A function to update the state with the latest organization profiles.
- * @returns A function to unsubscribe from the Firestore listener.
+ * @returns A promise that resolves to an array of OrganizationProfile.
  */
-const getAllOrganizationProfiles = (
-  callback: (profiles: OrganizationProfile[]) => void
-): (() => void) => {
+const fetchAllOrganizationProfiles = async (): Promise<
+  OrganizationProfile[]
+> => {
   try {
-    const organizationsCollection = collection(db, 'organizations');
+    const organizationsCollection = collection(db, 'organization');
+    const snapshot = await getDocs(organizationsCollection);
 
-    // Subscribe to Firestore collection updates
-    const unsubscribe = onSnapshot(organizationsCollection, (snapshot) => {
-      if (snapshot.empty) {
-        console.info('No organization profiles found.');
-        callback([]);
-        return;
-      }
+    if (snapshot.empty) {
+      console.info('No organization profiles found.');
+      return [];
+    }
 
-      const profiles: OrganizationProfile[] = snapshot.docs.map((doc) => {
-        return { ...doc.data(), uid: doc.id } as OrganizationProfile;
-      });
+    const profiles: OrganizationProfile[] = snapshot.docs.map((doc) => ({
+      ...doc.data(),
+      uid: doc.id,
+    })) as OrganizationProfile[];
 
-      callback(profiles);
-    });
-
-    return unsubscribe; // cleanup
+    return profiles;
   } catch (error) {
-    console.error('Error listening to organization profiles:', error);
+    console.error('Error fetching organization profiles:', error);
     throw error;
   }
 };
 
-export { getOrCreateDocument, updateDocument, getAllOrganizationProfiles };
+export { getOrCreateDocument, updateDocument, fetchAllOrganizationProfiles };
