@@ -9,8 +9,8 @@ import { useUser } from '@/hooks';
 import { SearchBar } from '@/components/common';
 
 const DonorDashboard = () => {
-  const [searchQuery, setSearchQuery] = useState(''); // New state for search query
-  const { organizationProfiles } = useUser(); // Get organization profiles from context
+  const [searchQuery, setSearchQuery] = useState('');
+  const { organizationProfiles } = useUser();
 
   // Filtered organizations based on search query
   const filteredOrganizations = filter(organizationProfiles, (org) => {
