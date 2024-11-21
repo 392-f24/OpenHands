@@ -1,35 +1,24 @@
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { filter, lowerCase, some } from 'es-toolkit/compat';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { SearchBar } from '@/components/common';
 import OrganizationCard from '@/components/Home/OrganizationCard';
 
-const Home = () => {
-  const organizations = [
-    {
-      id: 1,
-      name: 'Community Food Pantry',
-      location: 'City Center',
-      description: 'Providing food for those in need.',
-      website: 'https://example.com',
-      needs: ['Bread', 'Canned Soup', 'Boxed Pasta', 'Fresh Vegetables'],
-      loanable: false,
-      pickup: true,
-    },
-    {
-      id: 2,
-      name: 'Youth Theater Company',
-      location: 'Downtown',
-      description: 'Supporting young artists.',
-      website: 'https://example.com',
-      needs: ['Costumes', 'Props'],
-      loanable: true,
-      pickup: false,
-    },
-  ];
+import { getAllOrganizationProfiles } from '@/utils/firebase/firebaseUtils';
 
+const Home = () => {
   const [searchQuery, setSearchQuery] = useState(''); // New state for search query
+  const [organizations, setOrganizations] = useState<OrganizationProfile[]>([]);
+
+  useEffect(() => {
+    const fetchOrganizations = async () => {
+      const data = await getAllOrganizationProfiles();
+      setOrganizations(data);
+    };
+
+    fetchOrganizations();
+  }, []);
 
   // Filtered organizations based on search query
   const filteredOrganizations = filter(organizations, (org) => {
@@ -41,7 +30,7 @@ const Home = () => {
     );
   });
 
-  return (
+  return organizations.length > 0 ? (
     <div>
       <SearchBar
         searchQuery={searchQuery}
@@ -51,11 +40,19 @@ const Home = () => {
         {filteredOrganizations.map((org) => (
           <OrganizationCard
             organization={org}
-            key={org.id}
+            key={org.uid}
           />
         ))}
       </Box>
     </div>
+  ) : (
+    <Typography
+      variant='body1'
+      color='text.secondary'
+      m={5}
+    >
+      No organizations.
+    </Typography>
   );
 };
 

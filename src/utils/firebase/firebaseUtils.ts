@@ -1,5 +1,12 @@
 import type { DocumentData, WithFieldValue } from 'firebase/firestore';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+} from 'firebase/firestore';
 
 import { db } from './firebaseConfig';
 
@@ -56,4 +63,30 @@ const updateDocument = async <T>(
   }
 };
 
-export { getOrCreateDocument, updateDocument };
+/**
+ * Get all organization profiles from Firestore.
+ *
+ * @returns A promise that resolves to an array of OrganizationProfile objects.
+ */
+const getAllOrganizationProfiles = async (): Promise<OrganizationProfile[]> => {
+  try {
+    const organizationsCollection = collection(db, 'organizations');
+    const snapshot = await getDocs(organizationsCollection);
+
+    if (snapshot.empty) {
+      console.info('No organization profiles found.');
+      return [];
+    }
+
+    const profiles: OrganizationProfile[] = snapshot.docs.map((doc) => {
+      return { ...doc.data(), uid: doc.id } as OrganizationProfile;
+    });
+
+    return profiles;
+  } catch (error) {
+    console.error('Error fetching organization profiles:', error);
+    return [];
+  }
+};
+
+export { getOrCreateDocument, updateDocument, getAllOrganizationProfiles };

@@ -85,7 +85,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     try {
-      const collectionName = user.role;
+      const collectionName = user.role === 'donor' ? 'users' : 'organizations';
       await updateDocument<User>(collectionName, user.uid, updates);
       setUser((prev) => (prev ? { ...prev, ...updates } : undefined)); // Update local state
     } catch (error) {

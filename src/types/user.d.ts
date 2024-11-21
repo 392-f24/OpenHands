@@ -17,6 +17,7 @@ interface DonorProfile extends BasicProfile {
     quantityProvided: number;
     organizationId: string;
   }[];
+  saved: OrganizationProfile[];
 }
 
 interface OrganizationProfile extends BasicProfile {
@@ -36,6 +37,9 @@ interface OrganizationProfile extends BasicProfile {
       status: boolean; // true if provided
     }[];
   }[];
+  needs: string[];
+  loanable: boolean;
+  pickup: boolean;
 }
 
 type User = OrganizationProfile | DonorProfile;

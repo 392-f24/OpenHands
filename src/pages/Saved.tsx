@@ -13,7 +13,7 @@ const Saved = () => {
       {savedOrgs.length > 0 ? (
         savedOrgs.map((org) => (
           <SavedOrganizationCard
-            key={org.id}
+            key={org.uid}
             organization={org}
             onRemove={() => toggleSavedOrg(org)}
           />
