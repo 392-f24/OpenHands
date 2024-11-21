@@ -6,6 +6,7 @@ import {
   Button,
   Collapse,
   Typography,
+  Divider,
 } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import { lighten, useTheme } from '@mui/material/styles';
@@ -116,7 +117,7 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
             </Button>
           )}
           {organization.loanable && <Button variant='outlined'>Loan</Button>}
-          {user && (
+          {hasNeeds && user && (
             <Button
               variant='contained'
               onClick={() => handleAction('donate')}
@@ -132,17 +133,30 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
             donor={user as DonorProfile}
           />
         </CardActions>
-        <Collapse
-          in={isExpanded}
-          timeout='auto'
-          unmountOnExit
-        >
-          <NeedsList
-            needs={organization.needs}
-            checkedItems={checkedItems}
-            onToggle={handleCheckboxToggle}
-          />
-        </Collapse>
+        {hasNeeds ? (
+          <>
+            <Collapse
+              in={isExpanded}
+              timeout='auto'
+              unmountOnExit
+            >
+              <Divider />
+              <NeedsList
+                needs={organization.needs}
+                checkedItems={checkedItems}
+                onToggle={handleCheckboxToggle}
+              />
+            </Collapse>
+          </>
+        ) : (
+          <Typography
+            variant='body1'
+            color='text.secondary'
+            m={2}
+          >
+            No current needs.
+          </Typography>
+        )}
       </Card>
 
       <RoleSelectionModal

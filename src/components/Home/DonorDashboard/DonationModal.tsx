@@ -38,7 +38,7 @@ const DonationModal = ({
   const [message, setMessage] = useState<string>('');
   const { addOrUpdateEvent } = useEvents();
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (selectedNeeds.length === 0 || !selectedTime || !method) {
       setMessage('Please fill out all fields and select at least one need.');
       setOpenMessageDialog(true);
@@ -46,28 +46,36 @@ const DonationModal = ({
     }
 
     const newEvent: DonationEvent = {
-      eventId: `${organization.uid}-${new Date().toISOString()}`, // unique ID
+      eventId: `${organization.uid}-${donor.uid}-${new Date().toISOString()}`, // Unique ID
+      organizationId: organization.uid,
+      donorId: donor.uid,
       title: `Donation to ${organization.name}`,
       description: `Donation of items: ${selectedNeeds.join(', ')}`,
-      date: selectedTime.toDate(),
+      date: selectedTime!.toDate(), // Ensure selectedTime is not null
       supplies: selectedNeeds.map(
         (item) =>
           ({
             itemName: item,
             quantityNeeded: 1, // Default assumption
             quantityProvided: 1, // Donor provides these items
-            providedBy: [donor.uid],
+            providedBy: [donor.uid], // Add the donor ID
             status: true,
           }) as Supply
       ),
     };
 
-    addOrUpdateEvent(newEvent, selectedNeeds);
+    try {
+      // Add or update the event using the useEvents hook
+      await addOrUpdateEvent(newEvent);
 
-    setMessage('Donation successfully added to your schedule!');
-    setOpenMessageDialog(true);
-
-    onClose();
+      setMessage('Donation successfully added to your schedule!');
+      setOpenMessageDialog(true);
+      onClose(); // Close the modal
+    } catch (error) {
+      console.error('Error adding/updating event:', error);
+      setMessage('Failed to schedule donation. Please try again.');
+      setOpenMessageDialog(true);
+    }
   };
 
   return (

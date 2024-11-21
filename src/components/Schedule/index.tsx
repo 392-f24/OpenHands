@@ -14,7 +14,6 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { useToggle } from '@zl-asica/react';
-import { T } from 'vitest/dist/chunks/environment.LoooBwUu.js';
 
 interface ScheduleBaseProps {
   events: DonationEvent[];

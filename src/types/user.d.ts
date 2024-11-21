@@ -24,14 +24,8 @@ interface DonationEvent {
   title: string;
   description: string;
   date: Date;
+  donorId: string;
   supplies: Supply[];
-  donors: Array<{
-    donorId: string;
-    itemsProvided: Array<{
-      itemName: string;
-      quantity: number;
-    }>;
-  }>;
 }
 
 interface DonorProfile extends BasicProfile {
