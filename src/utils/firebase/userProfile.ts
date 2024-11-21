@@ -53,12 +53,10 @@ const getUserProfile = async (
   const userProfile =
     role === 'donor'
       ? await getOrCreateDocument<DonorProfile>(
-          'donor',
           uid,
           defaultProfile as DonorProfile
         )
       : await getOrCreateDocument<OrganizationProfile>(
-          'organizations',
           uid,
           defaultProfile as OrganizationProfile
         );

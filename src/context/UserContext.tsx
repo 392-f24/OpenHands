@@ -10,8 +10,8 @@ import {
   logoutUser,
   auth,
   updateDocument,
-  getAllOrganizationProfiles,
-  listenToEventsByIds,
+  fetchAllOrganizationProfiles,
+  fetchEventsByIds,
 } from '@/utils/firebase';
 
 interface UserContextType {
@@ -42,16 +42,18 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Monitor auth state changes
   useEffect(() => {
-    let unsubscribeProfiles: (() => void) | undefined;
-    let unsubscribeEvents: (() => void) | undefined;
+    const fetchProfiles = async () => {
+      const tempOrganizationProfiles = await fetchAllOrganizationProfiles();
+      setOrganizationProfiles(tempOrganizationProfiles);
+    };
 
-    if (organizationProfiles.length === 0) {
-      unsubscribeProfiles = getAllOrganizationProfiles(setOrganizationProfiles);
-    }
+    fetchProfiles();
+
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         if (user) {
-          unsubscribeEvents = listenToEventsByIds(user.joinedEvents, setEvents);
+          const fetchedEvents = await fetchEventsByIds(user.joinedEvents);
+          setEvents(fetchedEvents);
         } else {
           // if user logged in but not in local storage
           // clear user and let the user login again
@@ -64,8 +66,6 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => {
-      if (unsubscribeProfiles) unsubscribeProfiles();
-      if (unsubscribeEvents) unsubscribeEvents();
       unsubscribeAuth();
     };
   }, []);

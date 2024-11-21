@@ -3,47 +3,48 @@ import {
   deleteDoc,
   doc,
   getDoc,
-  onSnapshot,
+  getDocs,
   setDoc,
 } from 'firebase/firestore';
 
 import { db } from './firebaseConfig';
 
 /**
- * Listen to all events by event IDs.
+ * Fetch all events by event IDs by filtering the entire events collection.
  *
- * @param eventIds The array of event IDs to listen for.
- * @param callback A function to update the state with the latest events data.
- * @returns A cleanup function to unsubscribe from the Firestore listener.
+ * @param eventIds The array of event IDs to fetch.
+ * @returns A promise that resolves to an array of DonationEvent.
  */
-const listenToEventsByIds = (
-  eventIds: string[],
-  callback: (events: DonationEvent[]) => void
-): (() => void) => {
-  const eventsCollection = collection(db, 'events');
-  const unsubscribes: (() => void)[] = [];
-
-  for (const eventId of eventIds) {
-    const eventRef = doc(eventsCollection, eventId);
-
-    const unsubscribe = onSnapshot(eventRef, (eventSnap) => {
-      if (eventSnap.exists()) {
-        const updatedEvent = {
-          ...eventSnap.data(),
-          eventId,
-        } as DonationEvent;
-
-        callback([updatedEvent]);
-      }
-    });
-
-    unsubscribes.push(unsubscribe);
+const fetchEventsByIds = async (
+  eventIds: string[]
+): Promise<DonationEvent[]> => {
+  if (eventIds.length === 0) {
+    console.info('No event IDs provided.');
+    return [];
   }
 
-  // Cleanup function to unsubscribe all listeners
-  return () => {
-    for (const unsubscribe of unsubscribes) unsubscribe();
-  };
+  try {
+    const eventsCollection = collection(db, 'events');
+    const snapshot = await getDocs(eventsCollection);
+
+    if (snapshot.empty) {
+      console.info('No events found in the collection.');
+      return [];
+    }
+
+    // Filter events based on the provided IDs
+    const events: DonationEvent[] = snapshot.docs
+      .filter((doc) => eventIds.includes(doc.id)) // Only keep documents matching the event IDs
+      .map((doc) => ({
+        ...doc.data(),
+        eventId: doc.id,
+      })) as DonationEvent[];
+
+    return events;
+  } catch (error) {
+    console.error('Error fetching events by IDs:', error);
+    throw error;
+  }
 };
 
 /**
@@ -93,4 +94,4 @@ const removeEvent = async (eventId: string): Promise<void> => {
   }
 };
 
-export { listenToEventsByIds, updateEvent, removeEvent };
+export { fetchEventsByIds, updateEvent, removeEvent };
