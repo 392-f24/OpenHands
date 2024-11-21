@@ -5,7 +5,7 @@ import {
   getDoc,
   getDocs,
   setDoc,
-  updateDoc,
+  onSnapshot,
 } from 'firebase/firestore';
 
 import { db } from './firebaseConfig';
@@ -29,11 +29,11 @@ const getOrCreateDocument = async <T extends WithFieldValue<DocumentData>>(
 
     if (docSnap.exists()) {
       return docSnap.data() as T; // Return existing document data
-    } else {
-      await setDoc(docRef, defaultData);
-      console.info(`New ${collectionName} profile created.`);
-      return defaultData; // Return the newly created document data
     }
+
+    await setDoc(docRef, defaultData);
+    console.info(`New ${collectionName} profile created.`);
+    return defaultData; // Return the newly created document data
   } catch (error) {
     console.error(`Error in getOrCreateDocument for ${collectionName}:`, error);
     return undefined; // Return undefined on failure
@@ -55,7 +55,7 @@ const updateDocument = async <T>(
 ): Promise<void> => {
   try {
     const docRef = doc(db, collectionName, uid);
-    await updateDoc(docRef, updates);
+    await setDoc(docRef, updates, { merge: true }); // Merge updates with existing data
     console.info(`Document in ${collectionName} updated successfully.`);
   } catch (error) {
     console.error(`Error updating document in ${collectionName}:`, error);
@@ -64,28 +64,36 @@ const updateDocument = async <T>(
 };
 
 /**
- * Get all organization profiles from Firestore.
+ * Listen to all organization profiles in Firestore.
  *
- * @returns A promise that resolves to an array of OrganizationProfile objects.
+ * @param callback A function to update the state with the latest organization profiles.
+ * @returns A function to unsubscribe from the Firestore listener.
  */
-const getAllOrganizationProfiles = async (): Promise<OrganizationProfile[]> => {
+const getAllOrganizationProfiles = (
+  callback: (profiles: OrganizationProfile[]) => void
+): (() => void) => {
   try {
     const organizationsCollection = collection(db, 'organizations');
-    const snapshot = await getDocs(organizationsCollection);
 
-    if (snapshot.empty) {
-      console.info('No organization profiles found.');
-      return [];
-    }
+    // Subscribe to Firestore collection updates
+    const unsubscribe = onSnapshot(organizationsCollection, (snapshot) => {
+      if (snapshot.empty) {
+        console.info('No organization profiles found.');
+        callback([]);
+        return;
+      }
 
-    const profiles: OrganizationProfile[] = snapshot.docs.map((doc) => {
-      return { ...doc.data(), uid: doc.id } as OrganizationProfile;
+      const profiles: OrganizationProfile[] = snapshot.docs.map((doc) => {
+        return { ...doc.data(), uid: doc.id } as OrganizationProfile;
+      });
+
+      callback(profiles);
     });
 
-    return profiles;
+    return unsubscribe; // cleanup
   } catch (error) {
-    console.error('Error fetching organization profiles:', error);
-    return [];
+    console.error('Error listening to organization profiles:', error);
+    throw error;
   }
 };
 

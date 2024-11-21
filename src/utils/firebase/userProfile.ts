@@ -52,7 +52,7 @@ const getDonorProfile = async (
     saved: [],
   };
 
-  return getOrCreateDocument<DonorProfile>('users', uid, defaultProfile);
+  return getOrCreateDocument<DonorProfile>('donor', uid, defaultProfile);
 };
 
 const getOrganizationProfile = async (

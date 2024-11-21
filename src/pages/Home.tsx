@@ -1,27 +1,18 @@
 import { Box, Typography } from '@mui/material';
 import { filter, lowerCase, some } from 'es-toolkit/compat';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+
+import { useUser } from '@/hooks';
 
 import { SearchBar } from '@/components/common';
 import OrganizationCard from '@/components/Home/OrganizationCard';
 
-import { getAllOrganizationProfiles } from '@/utils/firebase/firebaseUtils';
-
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState(''); // New state for search query
-  const [organizations, setOrganizations] = useState<OrganizationProfile[]>([]);
-
-  useEffect(() => {
-    const fetchOrganizations = async () => {
-      const data = await getAllOrganizationProfiles();
-      setOrganizations(data);
-    };
-
-    fetchOrganizations();
-  }, []);
+  const { organizationProfiles } = useUser(); // Get organization profiles from context
 
   // Filtered organizations based on search query
-  const filteredOrganizations = filter(organizations, (org) => {
+  const filteredOrganizations = filter(organizationProfiles, (org) => {
     const searchTerm = lowerCase(searchQuery);
     return (
       lowerCase(org.name).includes(searchTerm) ||
@@ -30,7 +21,7 @@ const Home = () => {
     );
   });
 
-  return organizations.length > 0 ? (
+  return organizationProfiles.length > 0 ? (
     <div>
       <SearchBar
         searchQuery={searchQuery}

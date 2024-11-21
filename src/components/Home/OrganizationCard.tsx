@@ -16,7 +16,7 @@ import { lighten, useTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { useToggle } from '@zl-asica/react';
 
-import { useSaved } from '@/hooks';
+import { useSavedOrgs } from '@/hooks';
 
 import { DonationModal } from '@/components/common';
 
@@ -25,7 +25,7 @@ const OrganizationCard: React.FC<{ organization: OrganizationProfile }> = ({
 }) => {
   const theme = useTheme();
   const [isExpanded, toggleExpand] = useToggle();
-  const { savedOrgs, toggleSavedOrg } = useSaved();
+  const { savedOrgs, updateSavedOrgs } = useSavedOrgs();
   const isSaved = savedOrgs.some((org) => org.uid === organization.uid);
   const [isModalOpen, toggleModal] = useToggle();
   const [checkedItems, setCheckedItems] = useState<boolean[]>([]);
@@ -65,7 +65,7 @@ const OrganizationCard: React.FC<{ organization: OrganizationProfile }> = ({
         action={
           <Button
             color={isSaved ? 'secondary' : 'primary'}
-            onClick={() => toggleSavedOrg(organization)}
+            onClick={() => updateSavedOrgs(organization)}
           >
             {isSaved ? 'Unsave' : 'Save'}
           </Button>
