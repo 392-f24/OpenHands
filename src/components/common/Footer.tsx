@@ -7,6 +7,8 @@ import {
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 
+import { useUser } from '@/hooks';
+
 // Get the index of the page based on the path
 const getPageIndex = (path: string) => {
   switch (path) {
@@ -29,7 +31,54 @@ const getPageIndex = (path: string) => {
 };
 
 const Footer = () => {
+  const { user } = useUser();
+  const userType = user?.role || 'guest';
   const location = useLocation();
+
+  // Build navigation actions as an array
+  const navigationActions = [
+    <BottomNavigationAction
+      key='home'
+      label='Home'
+      icon={<Home />}
+      component={Link}
+      to='/'
+    />,
+  ];
+
+  if (userType !== 'guest') {
+    navigationActions.push(
+      <BottomNavigationAction
+        key='schedule'
+        label='Schedule'
+        icon={<CalendarMonth />}
+        component={Link}
+        to='/schedule'
+      />
+    );
+
+    if (userType === 'donor') {
+      navigationActions.push(
+        <BottomNavigationAction
+          key='saved'
+          label='Saved'
+          icon={<Bookmark />}
+          component={Link}
+          to='/saved'
+        />
+      );
+    }
+
+    navigationActions.push(
+      <BottomNavigationAction
+        key='alerts'
+        label='Alerts'
+        icon={<Notifications />}
+        component={Link}
+        to='/alerts'
+      />
+    );
+  }
 
   return (
     <BottomNavigation
@@ -45,31 +94,9 @@ const Footer = () => {
         zIndex: 1000, // Ensure the footer is always on top
       }}
     >
-      <BottomNavigationAction
-        label='Home'
-        icon={<Home />}
-        component={Link}
-        to='/'
-      />
-      <BottomNavigationAction
-        label='Schedule'
-        icon={<CalendarMonth />}
-        component={Link}
-        to='/schedule'
-      />
-      <BottomNavigationAction
-        label='Saved'
-        icon={<Bookmark />}
-        component={Link}
-        to='/saved'
-      />
-      <BottomNavigationAction
-        label='Alerts'
-        icon={<Notifications />}
-        component={Link}
-        to='/alerts'
-      />
+      {navigationActions}
     </BottomNavigation>
   );
 };
+
 export default Footer;

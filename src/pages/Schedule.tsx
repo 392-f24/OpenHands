@@ -9,17 +9,20 @@ const DonorSchedule = () => {
     return null;
   }
 
-  return user.role === 'donor' ? (
+  const title =
+    user.role === 'donor'
+      ? 'Your Donation Schedule'
+      : 'Your Organization Events';
+  const description =
+    user.role === 'donor'
+      ? 'View and manage your scheduled donations.'
+      : 'View and manage your organization’s upcoming events.';
+
+  return (
     <ScheduleBase
       events={events}
-      title='Your Donation Schedule'
-      description='View and manage your scheduled donations.'
-    />
-  ) : (
-    <ScheduleBase
-      events={events}
-      title='Your Organization Events'
-      description='View and manage your organization’s upcoming events.'
+      title={title}
+      description={description}
     />
   );
 };
