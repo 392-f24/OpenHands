@@ -12,6 +12,7 @@ const createDefaultProfile = (
     name: basicData.name as string,
     email: basicData.email as string,
     profilePic: basicData.profilePic as string,
+    joinedEvents: [],
     createdAt: new Date(),
     role,
   };
@@ -19,7 +20,6 @@ const createDefaultProfile = (
   if (role === 'donor') {
     return {
       ...baseProfile,
-      joinedEvents: [],
       providedSupplies: [],
       saved: [],
     };
@@ -30,7 +30,6 @@ const createDefaultProfile = (
     location: '',
     description: '',
     website: '',
-    events: [],
     needs: [],
     loanable: false,
     pickup: false,

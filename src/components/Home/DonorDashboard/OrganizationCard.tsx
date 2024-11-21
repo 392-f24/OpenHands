@@ -27,6 +27,7 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
   const theme = useTheme();
   const { user } = useUser();
   const { savedOrgs, updateSavedOrgs } = useSavedOrgs();
+  const hasNeeds = organization.needs.length > 0 ? true : false;
   const [isModalOpen, toggleModal] = useToggle();
   const [isExpanded, toggleExpand] = useToggle();
   const [roleDialogOpen, toggleRoleDialog] = useToggle();
@@ -108,10 +109,12 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
           </Button>
         </CardContent>
         <CardActions>
-          <Button onClick={toggleExpand}>
-            {isExpanded ? 'Hide Needs' : 'Show Needs'}
-            {isExpanded ? <ExpandLess /> : <ExpandMore />}
-          </Button>
+          {hasNeeds && (
+            <Button onClick={toggleExpand}>
+              {isExpanded ? 'Hide Needs' : 'Show Needs'}
+              {isExpanded ? <ExpandLess /> : <ExpandMore />}
+            </Button>
+          )}
           {organization.loanable && <Button variant='outlined'>Loan</Button>}
           {user && (
             <Button
@@ -126,6 +129,7 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
             onClose={toggleModal}
             organization={organization}
             selectedNeeds={checkedItemsList}
+            donor={user as DonorProfile}
           />
         </CardActions>
         <Collapse

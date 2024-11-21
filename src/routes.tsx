@@ -9,7 +9,6 @@ import { ProtectedRoute } from '@/components/common';
 
 const AppRoutes = () => {
   const routeConfig = [
-    { path: '/', element: <Home /> },
     { path: '/schedule', element: <Schedule /> },
     { path: '/saved', element: <Saved /> },
     { path: '/alerts', element: <Alerts /> },
@@ -17,6 +16,10 @@ const AppRoutes = () => {
 
   return (
     <Routes>
+      <Route
+        path='/'
+        element={<Home />}
+      />
       {routeConfig.map(({ path, element }) => (
         <Route
           key={path}

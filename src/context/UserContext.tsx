@@ -11,11 +11,13 @@ import {
   auth,
   updateDocument,
   getAllOrganizationProfiles,
+  listenToEventsByIds,
 } from '@/utils/firebase';
 
 interface UserContextType {
   user: User | undefined;
   organizationProfiles: OrganizationProfile[];
+  events: DonationEvent[];
   loading: boolean;
   login: (userType: UserType, navigate: NavigateFunction) => Promise<void>;
   logout: (navigate: NavigateFunction) => Promise<void>;
@@ -32,18 +34,25 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
   );
   const { value: organizationProfiles, setValue: setOrganizationProfiles } =
     useSessionStorage<OrganizationProfile[]>('organizationProfiles', []);
+  const { value: events, setValue: setEvents } = useSessionStorage<
+    DonationEvent[]
+  >('events', []);
+
   const [loading, setLoading] = useState(true);
 
   // Monitor auth state changes
   useEffect(() => {
     let unsubscribeProfiles: (() => void) | undefined;
+    let unsubscribeEvents: (() => void) | undefined;
 
     if (organizationProfiles.length === 0) {
       unsubscribeProfiles = getAllOrganizationProfiles(setOrganizationProfiles);
     }
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        if (!user) {
+        if (user) {
+          unsubscribeEvents = listenToEventsByIds(user.joinedEvents, setEvents);
+        } else {
           // if user logged in but not in local storage
           // clear user and let the user login again
           setUser(undefined);
@@ -56,6 +65,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
     return () => {
       if (unsubscribeProfiles) unsubscribeProfiles();
+      if (unsubscribeEvents) unsubscribeEvents();
       unsubscribeAuth();
     };
   }, []);
@@ -117,6 +127,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
       value={{
         user,
         organizationProfiles,
+        events,
         loading,
         login,
         logout,

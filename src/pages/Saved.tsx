@@ -2,7 +2,7 @@ import { Box, Typography } from '@mui/material';
 
 import { useSavedOrgs } from '@/hooks';
 
-import SavedOrganizationCard from '@/components/Home/SavedCard';
+import SavedOrganizationCard from '@/components/Saved/SavedCard';
 
 const Saved = () => {
   const { savedOrgs, updateSavedOrgs } = useSavedOrgs();

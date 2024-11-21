@@ -5,6 +5,7 @@ interface BasicProfile {
   name: string;
   email: string;
   profilePic: string;
+  joinedEvents: string[];
   createdAt: Date;
   role: UserType;
 }
@@ -17,16 +18,23 @@ interface Supply {
   status: boolean;
 }
 
-interface Event {
-  eventId: string;
+interface DonationEvent {
+  eventId: string; // Unique identifier
+  organizationId: string;
   title: string;
   description: string;
   date: Date;
   supplies: Supply[];
+  donors: Array<{
+    donorId: string;
+    itemsProvided: Array<{
+      itemName: string;
+      quantity: number;
+    }>;
+  }>;
 }
 
 interface DonorProfile extends BasicProfile {
-  joinedEvents: string[]; // array of eventIds
   providedSupplies: Array<{
     eventId: string;
     itemName: string;
@@ -40,7 +48,6 @@ interface OrganizationProfile extends BasicProfile {
   location: string;
   description: string;
   website: string;
-  events: Event[];
   needs: string[];
   loanable: boolean;
   pickup: boolean;
