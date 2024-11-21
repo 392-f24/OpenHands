@@ -5,5 +5,5 @@ export { default as SearchBar } from './SearchBar';
 export { default as ConfirmationDialog } from './ConfirmationDialog';
 export { default as ProtectedRoute } from './ProtectedRoute';
 export { default as MessageDialog } from './MessageDialog';
-export { default as DonationModal } from './DonationModal';
 export { default as CustomDialog } from './CustomDialog';
+export { default as RoleSelectionModal } from './RoleSelectionModal';

@@ -3,85 +3,69 @@ import type { NavigateFunction } from 'react-router-dom';
 
 import { getOrCreateDocument } from './firebaseUtils';
 
-const getUserProfile = async (
-  user: User,
-  role: 'donor' | 'organization',
-  navigate: NavigateFunction
-): Promise<DonorProfile | OrganizationProfile | undefined> => {
-  const { uid, email, photoURL, displayName } = user;
-
-  const userProfile =
-    role === 'donor'
-      ? getDonorProfile(
-          uid,
-          email as string,
-          photoURL as string,
-          displayName as string
-        )
-      : getOrganizationProfile(
-          uid,
-          email as string,
-          photoURL as string,
-          displayName as string
-        );
-
-  if (role === 'donor' || !userProfile) {
-    navigate('/');
-  } else if (role === 'organization') {
-    navigate('/organization-dashboard');
-  }
-
-  return userProfile;
-};
-
-const getDonorProfile = async (
-  uid: string,
-  email: string, // Login email from authentication
-  photoURL: string,
-  displayName: string
-): Promise<DonorProfile | undefined> => {
-  const defaultProfile: DonorProfile = {
-    uid,
-    name: displayName,
-    email, // Store the login email
-    profilePic: photoURL,
+const createDefaultProfile = (
+  role: UserType,
+  basicData: Partial<BasicProfile>
+): DonorProfile | OrganizationProfile => {
+  const baseProfile = {
+    uid: basicData.uid as string,
+    name: basicData.name as string,
+    email: basicData.email as string,
+    profilePic: basicData.profilePic as string,
+    joinedEvents: [],
     createdAt: new Date(),
-    role: 'donor',
-    joinedEvents: [], // Initialize empty array
-    providedSupplies: [], // Initialize empty array
-    saved: [],
+    role,
   };
 
-  return getOrCreateDocument<DonorProfile>('donor', uid, defaultProfile);
-};
+  if (role === 'donor') {
+    return {
+      ...baseProfile,
+      providedSupplies: [],
+      saved: [],
+    };
+  }
 
-const getOrganizationProfile = async (
-  uid: string,
-  email: string, // Login email for the organization
-  photoURL: string,
-  displayName: string
-): Promise<OrganizationProfile | undefined> => {
-  const defaultProfile: OrganizationProfile = {
-    uid,
-    name: displayName,
-    email, // Store the login email
-    profilePic: photoURL,
-    createdAt: new Date(),
-    role: 'organization',
-    location: '', // Default empty string
-    description: '', // Default empty string
-    website: '', // Default empty string
-    events: [], // Initialize empty array
+  return {
+    ...baseProfile,
+    location: '',
+    description: '',
+    website: '',
     needs: [],
     loanable: false,
     pickup: false,
   };
+};
 
-  return getOrCreateDocument<OrganizationProfile>(
-    'organizations',
+const getUserProfile = async (
+  user: User,
+  role: UserType,
+  navigate: NavigateFunction
+): Promise<DonorProfile | OrganizationProfile | undefined> => {
+  const { uid, email, photoURL, displayName } = user;
+
+  const defaultProfile = createDefaultProfile(role, {
     uid,
-    defaultProfile
-  );
+    email: email as string,
+    profilePic: photoURL || '',
+    name: displayName || 'Unnamed User',
+  });
+
+  const userProfile =
+    role === 'donor'
+      ? await getOrCreateDocument<DonorProfile>(
+          'donor',
+          uid,
+          defaultProfile as DonorProfile
+        )
+      : await getOrCreateDocument<OrganizationProfile>(
+          'organizations',
+          uid,
+          defaultProfile as OrganizationProfile
+        );
+
+  navigate('/');
+
+  return userProfile;
 };
 
 export default getUserProfile;

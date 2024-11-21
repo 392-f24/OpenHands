@@ -15,6 +15,7 @@ export default defineConfig({
     environment: 'jsdom',
   },
   build: {
+    cssCodeSplit: true,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -26,9 +27,6 @@ export default defineConfig({
             '@mui/x-date-pickers',
           ],
           firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
-          dateFns: ['date-fns'],
-          bigCalendar: ['react-big-calendar'],
-          moment: ['moment'],
         },
       },
     },
