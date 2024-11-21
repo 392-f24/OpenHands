@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { filter, lowerCase, some } from 'es-toolkit/compat';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { useUser } from '@/hooks';
 
