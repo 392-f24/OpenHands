@@ -1,14 +1,21 @@
 import { createContext, useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import type { NavigateFunction } from 'react-router-dom';
-import { useLocalStorage } from '@zl-asica/react';
+import { useLocalStorage, useSessionStorage } from '@zl-asica/react';
 
 import LoadingCircle from '@/components/common/LoadingCircle';
 
-import { loginUser, logoutUser, auth, updateDocument } from '@/utils/firebase';
+import {
+  loginUser,
+  logoutUser,
+  auth,
+  updateDocument,
+  getAllOrganizationProfiles,
+} from '@/utils/firebase';
 
 interface UserContextType {
   user: User | undefined;
+  organizationProfiles: OrganizationProfile[];
   loading: boolean;
   login: (userType: UserType, navigate: NavigateFunction) => Promise<void>;
   logout: (navigate: NavigateFunction) => Promise<void>;
@@ -20,14 +27,21 @@ const UserContext = createContext<UserContextType>({} as UserContextType);
 const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { value: user, setValue: setUser } = useLocalStorage<User | undefined>(
     'user',
-    // eslint-disable-next-line
+    // eslint-disable-next-line unicorn/no-useless-undefined
     undefined
   );
+  const { value: organizationProfiles, setValue: setOrganizationProfiles } =
+    useSessionStorage<OrganizationProfile[]>('organizationProfiles', []);
   const [loading, setLoading] = useState(true);
 
   // Monitor auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    let unsubscribeProfiles: (() => void) | undefined;
+
+    if (organizationProfiles.length === 0) {
+      unsubscribeProfiles = getAllOrganizationProfiles(setOrganizationProfiles);
+    }
+    const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         if (!user) {
           // if user logged in but not in local storage
@@ -40,7 +54,10 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
       setLoading(false); // Stop loading spinner
     });
 
-    return () => unsubscribe();
+    return () => {
+      if (unsubscribeProfiles) unsubscribeProfiles();
+      unsubscribeAuth();
+    };
   }, []);
 
   // Handle login
@@ -78,15 +95,16 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Handle profile update
-  const updateProfile = async (updates: Partial<User>): Promise<void> => {
+  const updateProfile = async <T extends User>(
+    updates: Partial<T>
+  ): Promise<void> => {
     if (!user) {
       console.error('No user is currently logged in.');
       return;
     }
 
     try {
-      const collectionName = user.role;
-      await updateDocument<User>(collectionName, user.uid, updates);
+      await updateDocument<T>(user.role, user.uid, updates);
       setUser((prev) => (prev ? { ...prev, ...updates } : undefined)); // Update local state
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -96,7 +114,14 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <UserContext.Provider
-      value={{ user, loading, login, logout, updateProfile }}
+      value={{
+        user,
+        organizationProfiles,
+        loading,
+        login,
+        logout,
+        updateProfile,
+      }}
     >
       {loading ? <LoadingCircle /> : children}
     </UserContext.Provider>

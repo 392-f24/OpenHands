@@ -49,9 +49,10 @@ const getDonorProfile = async (
     role: 'donor',
     joinedEvents: [], // Initialize empty array
     providedSupplies: [], // Initialize empty array
+    saved: [],
   };
 
-  return getOrCreateDocument<DonorProfile>('users', uid, defaultProfile);
+  return getOrCreateDocument<DonorProfile>('donor', uid, defaultProfile);
 };
 
 const getOrganizationProfile = async (
@@ -71,6 +72,9 @@ const getOrganizationProfile = async (
     description: '', // Default empty string
     website: '', // Default empty string
     events: [], // Initialize empty array
+    needs: [],
+    loanable: false,
+    pickup: false,
   };
 
   return getOrCreateDocument<OrganizationProfile>(

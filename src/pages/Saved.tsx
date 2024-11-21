@@ -1,11 +1,11 @@
 import { Box, Typography } from '@mui/material';
 
-import { useSaved } from '@/hooks';
+import { useSavedOrgs } from '@/hooks';
 
 import SavedOrganizationCard from '@/components/Home/SavedCard';
 
 const Saved = () => {
-  const { savedOrgs, toggleSavedOrg } = useSaved();
+  const { savedOrgs, updateSavedOrgs } = useSavedOrgs();
 
   return (
     <Box>
@@ -13,9 +13,9 @@ const Saved = () => {
       {savedOrgs.length > 0 ? (
         savedOrgs.map((org) => (
           <SavedOrganizationCard
-            key={org.id}
+            key={org.uid}
             organization={org}
-            onRemove={() => toggleSavedOrg(org)}
+            onRemove={() => updateSavedOrgs(org)}
           />
         ))
       ) : (

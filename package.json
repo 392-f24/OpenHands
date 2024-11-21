@@ -31,7 +31,7 @@
     "@mui/lab": "^6.0.0-beta.15",
     "@mui/material": "^6.1.7",
     "@mui/x-date-pickers": "^7.22.2",
-    "@zl-asica/react": "^0.3.0",
+    "@zl-asica/react": "^0.3.4",
     "date-fns": "^4.1.0",
     "es-toolkit": "^1.27.0",
     "firebase": "^11.0.2",

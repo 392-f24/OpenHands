@@ -16,17 +16,17 @@ import { lighten, useTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { useToggle } from '@zl-asica/react';
 
-import { useSaved } from '@/hooks';
+import { useSavedOrgs } from '@/hooks';
 
 import { DonationModal } from '@/components/common';
 
-const OrganizationCard: React.FC<{ organization: Organization }> = ({
+const OrganizationCard: React.FC<{ organization: OrganizationProfile }> = ({
   organization,
 }) => {
   const theme = useTheme();
   const [isExpanded, toggleExpand] = useToggle();
-  const { savedOrgs, toggleSavedOrg } = useSaved();
-  const isSaved = savedOrgs.some((org) => org.id === organization.id);
+  const { savedOrgs, updateSavedOrgs } = useSavedOrgs();
+  const isSaved = savedOrgs.some((org) => org.uid === organization.uid);
   const [isModalOpen, toggleModal] = useToggle();
   const [checkedItems, setCheckedItems] = useState<boolean[]>([]);
   const [checkedItemsList, setCheckedItemsList] = useState<string[]>([]);
@@ -65,7 +65,7 @@ const OrganizationCard: React.FC<{ organization: Organization }> = ({
         action={
           <Button
             color={isSaved ? 'secondary' : 'primary'}
-            onClick={() => toggleSavedOrg(organization)}
+            onClick={() => updateSavedOrgs(organization)}
           >
             {isSaved ? 'Unsave' : 'Save'}
           </Button>
@@ -110,17 +110,27 @@ const OrganizationCard: React.FC<{ organization: Organization }> = ({
         timeout='auto'
         unmountOnExit
       >
-        <List>
-          {organization.needs.map((need: string, index: number) => (
-            <ListItem key={index}>
-              <Checkbox
-                checked={checkedItems[index]}
-                onChange={() => handleCheckboxToggle(index)}
-              />
-              <ListItemText primary={need} />
-            </ListItem>
-          ))}
-        </List>
+        {organization.needs.length > 0 ? (
+          <List>
+            {organization.needs.map((need: string, index: number) => (
+              <ListItem key={index}>
+                <Checkbox
+                  checked={checkedItems[index]}
+                  onChange={() => handleCheckboxToggle(index)}
+                />
+                <ListItemText primary={need} />
+              </ListItem>
+            ))}
+          </List>
+        ) : (
+          <Typography
+            variant='body1'
+            color='text.secondary'
+            m={2}
+          >
+            No current needs.
+          </Typography>
+        )}
       </Collapse>
     </Card>
   );

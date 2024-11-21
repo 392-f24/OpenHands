@@ -7,18 +7,8 @@ import {
 } from '@mui/material';
 import { lighten, useTheme } from '@mui/material/styles';
 
-interface Organization {
-  id: number;
-  name: string;
-  location: string;
-  description: string;
-  website: string;
-  needs: string[];
-  loanable: boolean;
-}
-
 const SavedOrganizationCard: React.FC<{
-  organization: Organization;
+  organization: OrganizationProfile;
   onRemove: () => void;
 }> = ({ organization, onRemove }) => {
   const theme = useTheme();

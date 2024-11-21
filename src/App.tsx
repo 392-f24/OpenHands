@@ -4,7 +4,6 @@ import { ThemeProvider } from '@mui/material';
 import { BrowserRouter as Router } from 'react-router-dom';
 
 import { UserProvider } from '@/context/UserContext';
-import { SavedProvider } from '@/context/SavedContext';
 import { EventsProvider } from '@/context/EventsContext';
 import AppRoutes from '@/routes';
 
@@ -17,25 +16,23 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <UserProvider>
         <EventsProvider>
-          <SavedProvider>
-            <div className='App'>
-              <Router
-                future={{
-                  v7_relativeSplatPath: true,
-                  v7_startTransition: true,
-                }}
-              >
-                <Header />
-                <div className='content'>
-                  {/* Main content area where pages will render */}
-                  <AppRoutes />
-                </div>
+          <div className='App'>
+            <Router
+              future={{
+                v7_relativeSplatPath: true,
+                v7_startTransition: true,
+              }}
+            >
+              <Header />
+              <div className='content'>
+                {/* Main content area where pages will render */}
+                <AppRoutes />
+              </div>
 
-                {/* Bottom Navigation with React Router links */}
-                <Footer />
-              </Router>
-            </div>
-          </SavedProvider>
+              {/* Bottom Navigation with React Router links */}
+              <Footer />
+            </Router>
+          </div>
         </EventsProvider>
       </UserProvider>
     </ThemeProvider>
