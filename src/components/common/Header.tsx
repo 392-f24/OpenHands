@@ -13,10 +13,10 @@ import { useToggle } from '@zl-asica/react';
 
 import { useUser } from '@/hooks';
 
-import { CustomDialog, ConfirmationDialog } from '@/components/common';
+import { RoleSelectionModal, ConfirmationDialog } from '@/components/common';
 
 const Header = () => {
-  const { user, login, logout } = useUser();
+  const { user, logout } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -107,28 +107,10 @@ const Header = () => {
         </Box>
       </Toolbar>
 
-      {/* Role Selection Dialog */}
-      <CustomDialog
+      {/* Role Selection */}
+      <RoleSelectionModal
         open={roleDialogOpen}
         onClose={toggleRoleDialog}
-        title='Select Role'
-        description='Please select your role to proceed.'
-        actions={[
-          {
-            text: 'Donor',
-            onClick: async () => {
-              await login('donor', navigate);
-              toggleRoleDialog();
-            },
-          },
-          {
-            text: 'Organization',
-            onClick: async () => {
-              await login('organization', navigate);
-              toggleRoleDialog();
-            },
-          },
-        ]}
       />
     </AppBar>
   );

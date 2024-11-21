@@ -6,59 +6,85 @@ import {
   Button,
   Collapse,
   List,
+  Typography,
+  Checkbox,
   ListItem,
   ListItemText,
-  Checkbox,
-  Typography,
 } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import { lighten, useTheme } from '@mui/material/styles';
-import { useEffect, useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useToggle } from '@zl-asica/react';
+
+import DonationModal from './DonationModal';
 
 import { useSavedOrgs } from '@/hooks';
 
-import { DonationModal } from '@/components/common';
+const NeedsList: React.FC<{
+  needs: string[];
+  checkedItems: boolean[];
+  onToggle: (index: number) => void;
+}> = ({ needs, checkedItems, onToggle }) => (
+  <>
+    {needs.length > 0 ? (
+      <List>
+        {needs.map((need, index) => (
+          <ListItem key={index}>
+            <Checkbox
+              checked={checkedItems[index]}
+              onChange={() => onToggle(index)}
+            />
+            <ListItemText primary={need} />
+          </ListItem>
+        ))}
+      </List>
+    ) : (
+      <Typography
+        variant='body1'
+        color='text.secondary'
+        m={2}
+      >
+        No current needs.
+      </Typography>
+    )}
+  </>
+);
 
 const OrganizationCard: React.FC<{ organization: OrganizationProfile }> = ({
   organization,
 }) => {
   const theme = useTheme();
-  const [isExpanded, toggleExpand] = useToggle();
   const { savedOrgs, updateSavedOrgs } = useSavedOrgs();
-  const isSaved = savedOrgs.some((org) => org.uid === organization.uid);
   const [isModalOpen, toggleModal] = useToggle();
-  const [checkedItems, setCheckedItems] = useState<boolean[]>([]);
-  const [checkedItemsList, setCheckedItemsList] = useState<string[]>([]);
+  const [isExpanded, toggleExpand] = useToggle();
+  const [checkedItems, setCheckedItems] = useState<boolean[]>(
+    organization.needs.map(() => false)
+  );
 
-  // Function to handle checkbox toggling
+  const isSaved = useMemo(
+    () => savedOrgs.some((org) => org.uid === organization.uid),
+    [savedOrgs, organization.uid]
+  );
+
+  const checkedItemsList = useMemo(
+    () => organization.needs.filter((_, index) => checkedItems[index]),
+    [checkedItems, organization.needs]
+  );
+
   const handleCheckboxToggle = (index: number) => {
-    setCheckedItems((prevCheckedItems) => {
-      const newCheckedItems = [...prevCheckedItems];
-      newCheckedItems[index] = !newCheckedItems[index];
-      return newCheckedItems;
-    });
+    setCheckedItems((prevCheckedItems) =>
+      prevCheckedItems.map((item, i) => (i === index ? !item : item))
+    );
   };
 
-  useEffect(() => {
-    setCheckedItems(organization.needs.map(() => false));
-  }, [organization.needs]);
-
-  useEffect(() => {
-    const checked = organization.needs.filter(
-      (_: string, index: number) => checkedItems[index]
-    );
-    setCheckedItemsList(checked);
-  }, [checkedItems, organization.needs]);
+  const cardStyles = {
+    mt: 2,
+    mx: 2,
+    backgroundColor: lighten(theme.palette.primary.light, 0.8),
+  };
 
   return (
-    <Card
-      sx={{
-        mt: 2,
-        mx: 2,
-        backgroundColor: lighten(theme.palette.primary.light, 0.8),
-      }}
-    >
+    <Card sx={cardStyles}>
       <CardHeader
         title={organization.name}
         subheader={organization.location}
@@ -110,27 +136,11 @@ const OrganizationCard: React.FC<{ organization: OrganizationProfile }> = ({
         timeout='auto'
         unmountOnExit
       >
-        {organization.needs.length > 0 ? (
-          <List>
-            {organization.needs.map((need: string, index: number) => (
-              <ListItem key={index}>
-                <Checkbox
-                  checked={checkedItems[index]}
-                  onChange={() => handleCheckboxToggle(index)}
-                />
-                <ListItemText primary={need} />
-              </ListItem>
-            ))}
-          </List>
-        ) : (
-          <Typography
-            variant='body1'
-            color='text.secondary'
-            m={2}
-          >
-            No current needs.
-          </Typography>
-        )}
+        <NeedsList
+          needs={organization.needs}
+          checkedItems={checkedItems}
+          onToggle={handleCheckboxToggle}
+        />
       </Collapse>
     </Card>
   );
