@@ -31,8 +31,6 @@ const createDefaultProfile = (
     description: '',
     website: '',
     needs: [],
-    loanable: false,
-    pickup: false,
   };
 };
 

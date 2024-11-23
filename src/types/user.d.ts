@@ -16,6 +16,9 @@ interface Supply {
   quantityProvided: number;
   providedBy: string[]; // array of uid of donors
   status: boolean;
+  pickup: boolean;
+  loanable: boolean;
+  returnDate?: Date;
 }
 
 interface DonationEvent {
@@ -42,9 +45,7 @@ interface OrganizationProfile extends BasicProfile {
   location: string;
   description: string;
   website: string;
-  needs: string[];
-  loanable: boolean;
-  pickup: boolean;
+  needs: Supply[];
 }
 
 type User = DonorProfile | OrganizationProfile;
