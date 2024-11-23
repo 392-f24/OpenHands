@@ -8,12 +8,10 @@ import {
   DialogTitle,
   Button,
 } from '@mui/material';
-import type { PickersDayProps } from '@mui/x-date-pickers';
-import { LocalizationProvider, StaticDatePicker } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { useToggle } from '@zl-asica/react';
+
+import EventsCalendar from './EventsCalendar';
 
 interface ScheduleBaseProps {
   events: DonationEvent[];
@@ -26,24 +24,21 @@ const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
   const [selectedEvent, setSelectedEvent] = useState<DonationEvent | null>(
     null
   );
-  const [open, toggleOpen] = useToggle();
+  const [open, setOpen] = useState(false);
+
+  const handleEventClick = (event: DonationEvent) => {
+    setSelectedEvent(event);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedEvent(null);
+  };
 
   const eventsForSelectedDate = events.filter((event) =>
     dayjs(event.date).isSame(selectedDate, 'day')
   );
-
-  const handleEventClick = (event: DonationEvent) => {
-    setSelectedEvent(event);
-    toggleOpen();
-  };
-
-  const handleClose = () => {
-    toggleOpen();
-    setSelectedEvent(null);
-  };
-
-  const hasEventOnDate = (date: Dayjs) =>
-    events.some((event) => dayjs(event.date).isSame(date, 'day'));
 
   return (
     <Box sx={{ p: 2 }}>
@@ -62,46 +57,12 @@ const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
       >
         {description}
       </Typography>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <StaticDatePicker
-          value={selectedDate}
-          onChange={(newDate) => setSelectedDate(newDate)}
-          displayStaticWrapperAs='desktop'
-          // ! NEEDS TO BE FIXED
-          // @ts-expect-error: Ignore for now
-          renderDay={(
-            day: Dayjs,
-            _value: Dayjs,
-            DayComponentProps: PickersDayProps<Dayjs>
-          ) => {
-            const isEventDay = hasEventOnDate(day);
 
-            return (
-              <Box
-                sx={{
-                  position: 'relative',
-                }}
-              >
-                <div>{DayComponentProps.children}</div>
-                {isEventDay && (
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      bottom: 2,
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      width: 6,
-                      height: 6,
-                      borderRadius: '50%',
-                      backgroundColor: 'primary.main',
-                    }}
-                  />
-                )}
-              </Box>
-            );
-          }}
-        />
-      </LocalizationProvider>
+      <EventsCalendar
+        events={events}
+        setSelectedDate={setSelectedDate}
+      />
+
       <Box mt={2}>
         <Typography
           variant='h6'

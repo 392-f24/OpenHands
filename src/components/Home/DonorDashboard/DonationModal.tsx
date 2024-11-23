@@ -45,13 +45,17 @@ const DonationModal = ({
       return;
     }
 
+    // Convert the selected time to a local date
+    // In the format: 'YYYY-MM-DDTHH:mm:ss.sssZ'
+    const localDateTime = selectedTime.toDate().toISOString();
+
     const newEvent: DonationEvent = {
       eventId: `${organization.uid}-${donor.uid}-${new Date().toISOString()}`, // Unique ID
       organizationId: organization.uid,
       donorId: donor.uid,
-      title: `Donation to ${organization.name}`,
+      title: `To ${organization.name} from ${donor.name}`,
       description: `Donation of items: ${selectedNeeds.join(', ')}`,
-      date: selectedTime!.toDate(), // Ensure selectedTime is not null
+      date: localDateTime,
       supplies: selectedNeeds.map(
         (item) =>
           ({
