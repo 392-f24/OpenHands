@@ -3,7 +3,7 @@ import useUser from './useUser';
 import { updateEvent, removeEvent } from '@/utils/firebase';
 
 const useEvents = () => {
-  const { user, updateProfile } = useUser();
+  const { user, events, setEvents, updateProfile } = useUser();
 
   if (!user) {
     return {
@@ -32,6 +32,8 @@ const useEvents = () => {
 
       // Add or update the event in the Firestore collection
       await updateEvent(event);
+
+      setEvents([...events, event]); // Update local state
 
       console.info(
         isAlreadyJoined
