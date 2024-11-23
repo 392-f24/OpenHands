@@ -12,15 +12,10 @@ import { theme } from '@/utils/theme';
 
 const App = () => {
   return (
-    <ThemeProvider theme={theme}>
-      <UserProvider>
-        <div className='App'>
-          <Router
-            future={{
-              v7_relativeSplatPath: true,
-              v7_startTransition: true,
-            }}
-          >
+    <div className='App'>
+      <Router>
+        <ThemeProvider theme={theme}>
+          <UserProvider>
             <Header />
             <div className='content'>
               {/* Main content area where pages will render */}
@@ -29,10 +24,10 @@ const App = () => {
 
             {/* Bottom Navigation with React Router links */}
             <Footer />
-          </Router>
-        </div>
-      </UserProvider>
-    </ThemeProvider>
+          </UserProvider>
+        </ThemeProvider>
+      </Router>
+    </div>
   );
 };
 

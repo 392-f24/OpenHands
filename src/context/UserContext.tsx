@@ -18,6 +18,7 @@ interface UserContextType {
   user: User | undefined;
   organizationProfiles: OrganizationProfile[];
   events: DonationEvent[];
+  setEvents: (events: DonationEvent[]) => void;
   loading: boolean;
   login: (userType: UserType, navigate: NavigateFunction) => Promise<void>;
   logout: (navigate: NavigateFunction) => Promise<void>;
@@ -128,6 +129,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
         user,
         organizationProfiles,
         events,
+        setEvents,
         loading,
         login,
         logout,
