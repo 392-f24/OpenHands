@@ -23,7 +23,7 @@ interface DonationEvent {
   organizationId: string;
   title: string;
   description: string;
-  date: Date;
+  date: string; // Date in ISO format
   donorId: string;
   supplies: Supply[];
 }
