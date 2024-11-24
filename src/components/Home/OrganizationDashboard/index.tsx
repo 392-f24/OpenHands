@@ -12,6 +12,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Checkbox,
+  FormControlLabel,
+  IconButton,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
@@ -32,29 +35,76 @@ const OrganizationDashboard = () => {
       </Typography>
     );
   }
+
   const organization = user as OrganizationProfile;
 
-  const [newNeed, setNewNeed] = useState('');
+  const [newNeed, setNewNeed] = useState<Supply>({
+    itemName: '',
+    quantityNeeded: 1,
+    quantityProvided: 0,
+    providedBy: [],
+    pickup: false,
+    returnDate: undefined,
+    status: false,
+    loanable: false,
+  });
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [isAddingNeed, setIsAddingNeed] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editedProfile, setEditedProfile] = useState(organization);
 
   const { needs } = organization;
 
-  const handleAddNeed = async () => {
-    if (newNeed.trim()) {
-      const updatedNeeds = [...needs, newNeed.trim()];
-      setNewNeed('');
-      setIsAddingNeed(false);
+  const openAddModal = () => {
+    setNewNeed({
+      itemName: '',
+      quantityNeeded: 1,
+      quantityProvided: 0,
+      providedBy: [],
+      pickup: false,
+      returnDate: undefined,
+      status: false,
+      loanable: false,
+    });
+    setEditingIndex(null);
+    setIsAddingNeed(true);
+  };
+
+  const handleAddOrEditNeed = async () => {
+    if (newNeed.itemName.trim()) {
+      const sanitizedNeed = { ...newNeed };
+
+      // Remove `returnDate` if loanable is not checked
+      if (!newNeed.loanable) {
+        delete sanitizedNeed.returnDate;
+      }
+
+      const updatedNeeds = [...needs];
+      if (editingIndex === null) {
+        // Adding new need
+        updatedNeeds.push(sanitizedNeed);
+      } else {
+        // Editing existing need
+        updatedNeeds[editingIndex] = sanitizedNeed;
+      }
 
       try {
         await updateProfile({ needs: updatedNeeds });
         console.info('Needs updated successfully');
+        setIsAddingNeed(false); // Close the modal
       } catch (error) {
         console.error('Error updating needs:', error);
         alert('Failed to update needs. Please try again.');
       }
+    } else {
+      alert('Need name cannot be empty.');
     }
+  };
+
+  const openEditModal = (index: number) => {
+    setNewNeed({ ...needs[index] });
+    setEditingIndex(index);
+    setIsAddingNeed(true);
   };
 
   const saveProfile = async () => {
@@ -98,14 +148,12 @@ const OrganizationDashboard = () => {
             >
               Profile Information
             </Typography>
-            <Button
-              variant='outlined'
+            <IconButton
               color='primary'
-              startIcon={<EditIcon />}
               onClick={() => setIsEditingProfile(true)}
             >
-              Edit Profile
-            </Button>
+              <EditIcon />
+            </IconButton>
           </Box>
 
           <Box sx={{ mt: 2 }}>
@@ -164,46 +212,164 @@ const OrganizationDashboard = () => {
                   borderRadius: 1,
                   boxShadow: 1,
                 }}
+                secondaryAction={
+                  <IconButton
+                    edge='end'
+                    onClick={() => openEditModal(index)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                }
               >
                 <ListItemText
-                  primary={need}
+                  primary={
+                    <>
+                      <strong>{need.itemName}</strong> (Quantity:{' '}
+                      {need.quantityNeeded})
+                    </>
+                  }
+                  secondary={
+                    <>
+                      {need.pickup && (
+                        <Typography
+                          variant='body2'
+                          color='textSecondary'
+                        >
+                          Pickup Available
+                        </Typography>
+                      )}
+                      {need.loanable && (
+                        <Typography
+                          variant='body2'
+                          color='textSecondary'
+                        >
+                          Loanable
+                          {need.returnDate
+                            ? `, Returnable After: ${new Date(need.returnDate).toLocaleDateString()}`
+                            : ''}
+                        </Typography>
+                      )}
+                    </>
+                  }
                   sx={{ color: 'text.primary', fontWeight: 'medium' }}
                 />
               </ListItem>
             ))}
           </List>
 
-          {isAddingNeed ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-              <TextField
-                value={newNeed}
-                onChange={(e) => setNewNeed(e.target.value)}
-                placeholder='Enter new need'
-                size='small'
-                sx={{ flex: 1, marginRight: 1 }}
-              />
-              <Button
-                variant='contained'
-                color='primary'
-                onClick={handleAddNeed}
-                sx={{ minWidth: 100 }}
-              >
-                Add
-              </Button>
-            </Box>
-          ) : (
-            <Button
-              startIcon={<AddIcon />}
-              variant='contained'
-              color='success'
-              onClick={() => setIsAddingNeed(true)}
-              sx={{ mt: 2 }}
-            >
-              Add Needs
-            </Button>
-          )}
+          <Button
+            startIcon={<AddIcon />}
+            variant='contained'
+            color='success'
+            onClick={openAddModal}
+            sx={{ mt: 2 }}
+          >
+            Add Needs
+          </Button>
         </CardContent>
       </Card>
+
+      {/* Add/Edit Needs Modal */}
+      <Dialog
+        open={isAddingNeed}
+        onClose={() => setIsAddingNeed(false)}
+      >
+        <DialogTitle>
+          {editingIndex === null ? 'Add Need' : 'Edit Need'}
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            label='Need Name'
+            fullWidth
+            margin='dense'
+            value={newNeed.itemName}
+            onChange={(e) =>
+              setNewNeed((prev) => ({ ...prev, itemName: e.target.value }))
+            }
+          />
+          <TextField
+            label='Quantity Needed'
+            type='number'
+            fullWidth
+            margin='dense'
+            value={newNeed.quantityNeeded || ''} // Allow empty input temporarily
+            onChange={(e) => {
+              const value = e.target.value;
+              setNewNeed((prev) => ({
+                ...prev,
+                quantityNeeded:
+                  value === ''
+                    ? Number.NaN
+                    : Math.max(1, Number.parseInt(value, 10) || 1),
+              }));
+            }}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={newNeed.loanable}
+                onChange={(e) =>
+                  setNewNeed((prev) => ({
+                    ...prev,
+                    loanable: e.target.checked,
+                    returnDate: e.target.checked ? prev.returnDate : undefined,
+                  }))
+                }
+              />
+            }
+            label='Loanable'
+          />
+          {newNeed.loanable && (
+            <TextField
+              label='Returnable After'
+              type='date'
+              fullWidth
+              margin='dense'
+              value={
+                newNeed.returnDate
+                  ? new Date(newNeed.returnDate).toISOString().split('T')[0]
+                  : ''
+              }
+              onChange={(e) =>
+                setNewNeed((prev) => ({
+                  ...prev,
+                  returnDate: e.target.value
+                    ? new Date(e.target.value).toISOString()
+                    : undefined,
+                }))
+              }
+              InputLabelProps={{
+                shrink: true, // Ensures label stays on top
+              }}
+            />
+          )}
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={newNeed.pickup}
+                onChange={(e) =>
+                  setNewNeed((prev) => ({ ...prev, pickup: e.target.checked }))
+                }
+              />
+            }
+            label='Pickup Available'
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setIsAddingNeed(false)}
+            color='secondary'
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleAddOrEditNeed}
+            color='primary'
+          >
+            {editingIndex === null ? 'Add Need' : 'Save'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Profile Editing Dialog */}
       <Dialog
