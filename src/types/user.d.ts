@@ -6,7 +6,7 @@ interface BasicProfile {
   email: string;
   profilePic: string;
   joinedEvents: string[];
-  createdAt: Date;
+  createdAt: string;
   role: UserType;
 }
 
@@ -18,7 +18,7 @@ interface Supply {
   status: boolean;
   pickup: boolean;
   loanable: boolean;
-  returnDate?: Date;
+  returnDate?: string;
 }
 
 interface DonationEvent {
