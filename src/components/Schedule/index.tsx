@@ -7,12 +7,15 @@ import {
   DialogContent,
   DialogTitle,
   Button,
+  IconButton,
 } from '@mui/material';
+import EventIcon from '@mui/icons-material/Event';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
 import EventsCalendar from './EventsCalendar';
-import CalendarExportButton from './CalendarExportButton';
+
+import generateICSFile from '@/utils/generateICSFile';
 
 interface ScheduleBaseProps {
   events: DonationEvent[];
@@ -156,7 +159,14 @@ const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
                   {supply.itemName} - {supply.quantityProvided} provided
                 </Typography>
               ))}
-              <CalendarExportButton event={selectedEvent} />
+              <IconButton
+                color='primary'
+                onClick={() => generateICSFile(selectedEvent)}
+                sx={{ mt: 2 }}
+              >
+                <EventIcon />
+                Export to Calendar
+              </IconButton>
             </>
           )}
         </DialogContent>
