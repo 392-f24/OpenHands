@@ -20,6 +20,7 @@ export default [
       'unicorn/filename-case': 'off',
       'unicorn/expiring-todo-comments': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
+      'unicorn/prefer-string-replace-all': 'off',
     },
   },
 ];
