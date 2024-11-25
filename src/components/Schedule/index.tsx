@@ -12,6 +12,7 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
 import EventsCalendar from './EventsCalendar';
+import CalendarExportButton from './CalendarExportButton';
 
 interface ScheduleBaseProps {
   events: DonationEvent[];
@@ -155,6 +156,7 @@ const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
                   {supply.itemName} - {supply.quantityProvided} provided
                 </Typography>
               ))}
+              <CalendarExportButton event={selectedEvent} />
             </>
           )}
         </DialogContent>
