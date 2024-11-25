@@ -28,12 +28,12 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
   const theme = useTheme();
   const { user } = useUser();
   const { savedOrgs, updateSavedOrgs } = useSavedOrgs();
-  const hasNeeds = organization.needs.length > 0 ? true : false;
+  const hasNeeds = organization.needs.length > 0;
   const [isModalOpen, toggleModal] = useToggle();
   const [isExpanded, toggleExpand] = useToggle();
   const [roleDialogOpen, toggleRoleDialog] = useToggle();
   const [checkedItems, setCheckedItems] = useState<boolean[]>(
-    organization.needs.map(() => false)
+    organization.needs.map(() => false) // Initialize checked state for each need
   );
 
   const isSaved = useMemo(
@@ -41,11 +41,13 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
     [savedOrgs, organization.uid]
   );
 
+  // Extract the list of selected needs (based on checked items)
   const checkedItemsList = useMemo(
-    () => organization.needs.filter((_, index) => checkedItems[index]),
+    () => organization.needs.filter((_, index) => checkedItems[index]), // Return only checked needs
     [checkedItems, organization.needs]
   );
 
+  // Handle actions (Save or Donate)
   const handleAction = useCallback(
     (action: 'save' | 'donate') => {
       if (!user) {
@@ -62,6 +64,7 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
     [user, organization, toggleModal, toggleRoleDialog, updateSavedOrgs]
   );
 
+  // Toggle checkbox selection for needs
   const handleCheckboxToggle = useCallback((index: number) => {
     setCheckedItems((prevCheckedItems) =>
       prevCheckedItems.map((item, i) => (i === index ? !item : item))
@@ -116,7 +119,6 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
               {isExpanded ? <ExpandLess /> : <ExpandMore />}
             </Button>
           )}
-          {organization.loanable && <Button variant='outlined'>Loan</Button>}
           {hasNeeds && user && (
             <Button
               variant='contained'
@@ -129,25 +131,24 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
             open={isModalOpen}
             onClose={toggleModal}
             organization={organization}
-            selectedNeeds={checkedItemsList}
-            donor={user as DonorProfile}
+            selectedNeeds={checkedItemsList.map((need) => need.itemName)} // Pass selected item names to modal
+            donor={(user as DonorProfile) ?? {}}
           />
         </CardActions>
         {hasNeeds ? (
-          <>
-            <Collapse
-              in={isExpanded}
-              timeout='auto'
-              unmountOnExit
-            >
-              <Divider />
-              <NeedsList
-                needs={organization.needs}
-                checkedItems={checkedItems}
-                onToggle={handleCheckboxToggle}
-              />
-            </Collapse>
-          </>
+          <Collapse
+            in={isExpanded}
+            timeout='auto'
+            unmountOnExit
+          >
+            <Divider />
+            <NeedsList
+              needs={organization.needs.filter((need) => !need.status)} // Pass updated needs schema
+              checkedItems={checkedItems}
+              onToggle={handleCheckboxToggle}
+              loggedIn={Boolean(user)} // Pass loggedIn status
+            />
+          </Collapse>
         ) : (
           <Typography
             variant='body1'
