@@ -15,7 +15,7 @@ interface NeedsListProps {
 
 const OrgNeedsList = ({ organization }: NeedsListProps) => {
   const { addNeed, updateNeed } = useNeeds();
-  const [needs, setNeeds] = useState<Supply[]>(organization.needs);
+  const [needs, setNeeds] = useState<Supply[]>(organization.needs || []);
   const [selectedNeed, setSelectedNeed] = useState<Supply | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 

@@ -45,7 +45,7 @@ interface OrganizationProfile extends BasicProfile {
   location: string;
   description: string;
   website: string;
-  needs: Supply[];
+  needs: Supply[] | null;
 }
 
 type User = DonorProfile | OrganizationProfile;

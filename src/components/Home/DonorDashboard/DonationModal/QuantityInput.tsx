@@ -36,7 +36,7 @@ const QuantityInput = ({
         Provide Quantities for Selected Needs:
       </Typography>
       {selectedNeeds.map((needName) => {
-        const need = organization.needs.find((n) => n.itemName === needName);
+        const need = organization.needs?.find((n) => n.itemName === needName);
         const remaining = need?.quantityNeeded || 0;
         const provided = providedQuantities[needName] || 0;
 
