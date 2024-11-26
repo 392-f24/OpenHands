@@ -1,24 +1,20 @@
-import globals from 'globals';
-
 import { zlAsicaTsReactConfig } from 'eslint-config-zl-asica';
 
 export default [
   ...zlAsicaTsReactConfig,
   {
+    ignores: ['vite-env.d.ts', 'prettier.config.cjs', 'eslint.config.mjs'],
+  },
+  {
     files: ['**/*.{ts,tsx}'],
-    ignores: ['vite-env.d.ts'],
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
       parserOptions: {
-        project: './tsconfig.eslint.json',
-        projectService: true,
+        project: './tsconfig.app.json',
       },
     },
     rules: {
       'unicorn/prevent-abbreviations': 'off',
       'unicorn/filename-case': 'off',
-      'unicorn/expiring-todo-comments': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
       'unicorn/prefer-string-replace-all': 'off',
     },

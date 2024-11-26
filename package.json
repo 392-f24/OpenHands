@@ -5,14 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "npm run clean && tsc -b && vite build",
     "test": "vitest --ui",
     "test:ci": "vitest run",
-    "lint": "eslint src/**/*.{ts,tsx}",
-    "lint:fix": "eslint src/**/*.{ts,tsx} --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "preview": "vite preview",
-    "prepare": "husky"
+    "prepare": "husky",
+    "clean": "rm -rf dist ./node_modules/.tmp/tsconfig.app.tsbuildinfo"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
@@ -26,9 +27,7 @@
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
-    "@fontsource/roboto": "^5.1.0",
     "@mui/icons-material": "^6.1.8",
-    "@mui/lab": "^6.0.0-beta.15",
     "@mui/material": "^6.1.7",
     "@mui/x-date-pickers": "^7.22.3",
     "@zl-asica/react": "^0.3.4",
@@ -41,12 +40,10 @@
     "sonner": "^1.7.0"
   },
   "devDependencies": {
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/react": "^16.0.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/react-router-dom": "^5.3.3",
-    "@vitejs/plugin-react": "^4.3.3",
+    "@vitejs/plugin-react-swc": "^3.7.1",
     "@vitest/ui": "^2.1.4",
     "@zl-asica/prettier-config": "^1.0.9",
     "eslint-config-zl-asica": "^1.0.19",
@@ -54,9 +51,10 @@
     "husky": "^9.1.6",
     "jsdom": "^25.0.1",
     "lint-staged": "^15.2.10",
-    "typescript": "~5.6.2",
-    "typescript-eslint": "^8.11.0",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.16.0",
     "vite": "^5.4.11",
+    "vite-plugin-checker": "^0.8.0",
     "vite-tsconfig-paths": "^5.1.2",
     "vitest": "^2.1.4"
   },
