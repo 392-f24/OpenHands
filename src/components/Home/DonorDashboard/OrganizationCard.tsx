@@ -33,7 +33,7 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
   const [isExpanded, toggleExpand] = useToggle();
   const [roleDialogOpen, toggleRoleDialog] = useToggle();
   const [checkedItems, setCheckedItems] = useState<boolean[]>(
-    organization.needs.map(() => false)
+    organization.needs?.map(() => false) ?? []
   );
 
   const isSaved = useMemo(
@@ -42,7 +42,7 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
   );
 
   const checkedItemsList = useMemo(
-    () => organization.needs.filter((_, index) => checkedItems[index]),
+    () => organization.needs?.filter((_, index) => checkedItems[index]) ?? [],
     [checkedItems, organization.needs]
   );
 
@@ -99,7 +99,7 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
       >
         <Divider />
         <NeedsList
-          needs={organization.needs.filter((need) => !need.status)}
+          needs={organization.needs?.filter((need) => !need.status) ?? []}
           checkedItems={checkedItems}
           onToggle={handleCheckboxToggle}
           loggedIn={Boolean(user)}
@@ -116,7 +116,7 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
       </Typography>
     );
 
-  const hasNeeds = organization.needs.length > 0;
+  const hasNeeds = (organization.needs?.length ?? 0) > 0;
 
   return (
     <>
@@ -155,7 +155,7 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
             <Button
               variant='contained'
               onClick={() => handleAction('donate')}
-              disabled={checkedItemsList.length === 0}
+              disabled={checkedItemsList?.length === 0}
             >
               Donate
             </Button>
@@ -164,7 +164,7 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
             open={isModalOpen}
             onClose={toggleModal}
             organization={organization}
-            selectedNeeds={checkedItemsList.map((need) => need.itemName)}
+            selectedNeeds={checkedItemsList?.map((need) => need.itemName) ?? []}
             donor={(user as DonorProfile) ?? {}}
           />
         </CardActions>

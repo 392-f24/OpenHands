@@ -67,7 +67,10 @@ const useNeeds = (): UseNeedsHook => {
     };
 
     try {
-      const updatedNeeds = sanitizeNeeds([...orgProfile.needs, newNeed]);
+      const updatedNeeds = sanitizeNeeds([
+        ...(orgProfile.needs || []),
+        newNeed,
+      ]);
       await updateProfile({ needs: updatedNeeds });
       console.log(`Successfully added new need: ${itemName}`);
     } catch (error_) {
@@ -82,6 +85,8 @@ const useNeeds = (): UseNeedsHook => {
   ): Promise<void> => {
     const orgProfile = findOrganizationProfile(organizationId);
     if (!orgProfile) return;
+
+    if (!orgProfile.needs) return;
 
     try {
       const needIndex = orgProfile.needs.findIndex(
