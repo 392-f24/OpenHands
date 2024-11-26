@@ -1,6 +1,6 @@
 import '@/App.css';
 
-import { ThemeProvider } from '@mui/material';
+import { Box, ThemeProvider } from '@mui/material';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Toaster } from 'sonner';
 
@@ -13,7 +13,7 @@ import { theme } from '@/utils/theme';
 
 const App = () => {
   return (
-    <div className='App'>
+    <Box className='App'>
       <Router>
         <ThemeProvider theme={theme}>
           <Toaster
@@ -22,17 +22,17 @@ const App = () => {
           />
           <UserProvider>
             <Header />
-            <div className='content'>
+            <Box className='content'>
               {/* Main content area where pages will render */}
               <AppRoutes />
-            </div>
+            </Box>
 
             {/* Bottom Navigation with React Router links */}
             <Footer />
           </UserProvider>
         </ThemeProvider>
       </Router>
-    </div>
+    </Box>
   );
 };
 
