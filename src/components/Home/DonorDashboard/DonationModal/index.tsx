@@ -109,9 +109,9 @@ const DonationModal = ({
         />
         <DeliveryMethodSelector
           method={method}
-          isPickupAvailable={selectedNeeds.some(
+          isPickupAvailable={selectedNeeds?.some(
             (needName) =>
-              organization.needs.find((name_) => name_.itemName === needName)
+              organization.needs?.find((name_) => name_.itemName === needName)
                 ?.pickup
           )}
           onChange={setMethod}

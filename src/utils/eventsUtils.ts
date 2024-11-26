@@ -7,7 +7,7 @@ const generateUpdatedNeeds = (
   providedQuantities: { [key: string]: number },
   donorId: string
 ) =>
-  organization.needs.map((need) => {
+  organization.needs?.map((need) => {
     if (selectedNeeds.includes(need.itemName)) {
       const quantityProvided = providedQuantities[need.itemName] || 0;
       const remainingQuantity = need.quantityNeeded - quantityProvided;
@@ -43,7 +43,8 @@ const createDonationEvent = (
   description: `Donation of items: ${selectedNeeds.join(', ')}`,
   date: formattedDate,
   supplies: selectedNeeds.map((itemName) => {
-    const supply = organization.needs.find((n) => n.itemName === itemName);
+    const supply =
+      organization.needs?.find((n) => n.itemName === itemName) || null;
     return {
       itemName,
       quantityNeeded: supply?.quantityNeeded || 1,
