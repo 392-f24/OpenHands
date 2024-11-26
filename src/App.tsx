@@ -2,6 +2,7 @@ import '@/App.css';
 
 import { ThemeProvider } from '@mui/material';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { Toaster } from 'sonner';
 
 import { UserProvider } from '@/context/UserContext';
 import AppRoutes from '@/routes';
@@ -15,6 +16,10 @@ const App = () => {
     <div className='App'>
       <Router>
         <ThemeProvider theme={theme}>
+          <Toaster
+            richColors
+            position='top-center'
+          />
           <UserProvider>
             <Header />
             <div className='content'>

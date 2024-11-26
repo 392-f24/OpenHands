@@ -14,6 +14,7 @@ const DonorDashboard = () => {
 
   // Filtered organizations based on search query
   const filteredOrganizations = filter(organizationProfiles, (org) => {
+    if (org.name === '' || !org.name) return false;
     const searchTerm = lowerCase(searchQuery);
     return (
       lowerCase(org.name).includes(searchTerm) ||

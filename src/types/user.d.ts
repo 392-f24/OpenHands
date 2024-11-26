@@ -6,7 +6,7 @@ interface BasicProfile {
   email: string;
   profilePic: string;
   joinedEvents: string[];
-  createdAt: Date;
+  createdAt: string;
   role: UserType;
 }
 
@@ -16,6 +16,9 @@ interface Supply {
   quantityProvided: number;
   providedBy: string[]; // array of uid of donors
   status: boolean;
+  pickup: boolean;
+  loanable: boolean;
+  returnDate?: string;
 }
 
 interface DonationEvent {
@@ -42,9 +45,7 @@ interface OrganizationProfile extends BasicProfile {
   location: string;
   description: string;
   website: string;
-  needs: string[];
-  loanable: boolean;
-  pickup: boolean;
+  needs: Supply[];
 }
 
 type User = DonorProfile | OrganizationProfile;

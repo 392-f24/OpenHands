@@ -13,7 +13,7 @@ const createDefaultProfile = (
     email: basicData.email as string,
     profilePic: basicData.profilePic as string,
     joinedEvents: [],
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
     role,
   };
 
@@ -31,8 +31,6 @@ const createDefaultProfile = (
     description: '',
     website: '',
     needs: [],
-    loanable: false,
-    pickup: false,
   };
 };
 

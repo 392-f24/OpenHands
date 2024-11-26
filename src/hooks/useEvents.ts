@@ -1,6 +1,6 @@
 import useUser from './useUser';
 
-import { updateEvent, removeEvent } from '@/utils/firebase';
+import { updateEvent, updateDocument } from '@/utils/firebase';
 
 const useEvents = () => {
   const { user, events, setEvents, updateProfile } = useUser();
@@ -8,63 +8,48 @@ const useEvents = () => {
   if (!user) {
     return {
       events: [],
-      addOrUpdateEvent: async () => {
-        console.warn('No user logged in.');
-      },
-      removeEvent: async () => {
+      addDonationEvent: async () => {
         console.warn('No user logged in.');
       },
     };
   }
 
-  const { joinedEvents = [] } = user;
-
-  const addOrUpdateEvent = async (event: DonationEvent): Promise<void> => {
-    const isAlreadyJoined = joinedEvents.includes(event.eventId);
-
-    const updatedEvents = isAlreadyJoined
-      ? joinedEvents
-      : [...joinedEvents, event.eventId];
-
+  const addDonationEvent = async (
+    event: DonationEvent,
+    donorUpdates: Partial<DonorProfile>,
+    organizationUpdates: Partial<OrganizationProfile>
+  ): Promise<void> => {
     try {
-      // Update the user profile's joinedEvents
-      await updateProfile({ joinedEvents: updatedEvents });
+      // Step 1: Update the organization's profile (needs and joinedEvents)
+      if (organizationUpdates.uid) {
+        await updateDocument(
+          'organization',
+          organizationUpdates.uid,
+          organizationUpdates
+        );
+      }
 
-      // Add or update the event in the Firestore collection
+      // Step 2: Update the donor's profile (providedSupplies and joinedEvents)
+      if (donorUpdates.uid) {
+        await updateProfile(donorUpdates);
+      }
+
+      // Step 3: Save the event in Firestore
       await updateEvent(event);
 
-      setEvents([...events, event]); // Update local state
+      // Step 4: Update local state with the new event
+      setEvents([...events, event]);
 
-      console.info(
-        isAlreadyJoined
-          ? `Event ${event.eventId} updated successfully.`
-          : `Event ${event.eventId} added successfully.`
-      );
+      console.info(`Donation event ${event.eventId} created successfully.`);
     } catch (error) {
-      console.error('Error adding/updating event:', error);
-      alert('Failed to add/update event. Please try again.');
-    }
-  };
-
-  const removeEventFromUser = async (eventId: string): Promise<void> => {
-    const updatedEvents = joinedEvents.filter((id) => id !== eventId);
-
-    try {
-      // Update the user profile's joinedEvents
-      await updateProfile({ joinedEvents: updatedEvents });
-
-      // Remove the event from the Firestore collection
-      await removeEvent(eventId);
-    } catch (error) {
-      console.error('Error removing event:', error);
-      alert('Failed to remove event. Please try again.');
+      console.error('Error adding donation event:', error);
+      throw new Error('Failed to create donation event.');
     }
   };
 
   return {
-    events: joinedEvents, // Return user's joined events (IDs only)
-    addOrUpdateEvent,
-    removeEvent: removeEventFromUser,
+    events,
+    addDonationEvent,
   };
 };
 

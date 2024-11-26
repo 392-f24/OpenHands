@@ -14,7 +14,6 @@ const firebaseConfig = {
   storageBucket: 'openhands-48a60.firebasestorage.app',
   messagingSenderId: '772096397388',
   appId: '1:772096397388:web:5550007864b0df426ea4e9',
-  measurementId: 'G-6JHHGK385Z',
 };
 
 // Initialize Firebase

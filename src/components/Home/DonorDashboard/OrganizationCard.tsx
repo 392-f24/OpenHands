@@ -12,6 +12,7 @@ import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import { lighten, useTheme } from '@mui/material/styles';
 import { useState, useMemo, useCallback } from 'react';
 import { useToggle } from '@zl-asica/react';
+import { toast } from 'sonner';
 
 import DonationModal from './DonationModal';
 import NeedsList from './NeedList';
@@ -28,7 +29,6 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
   const theme = useTheme();
   const { user } = useUser();
   const { savedOrgs, updateSavedOrgs } = useSavedOrgs();
-  const hasNeeds = organization.needs.length > 0 ? true : false;
   const [isModalOpen, toggleModal] = useToggle();
   const [isExpanded, toggleExpand] = useToggle();
   const [roleDialogOpen, toggleRoleDialog] = useToggle();
@@ -47,14 +47,15 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
   );
 
   const handleAction = useCallback(
-    (action: 'save' | 'donate') => {
+    async (action: 'save' | 'donate') => {
       if (!user) {
         toggleRoleDialog();
         return;
       }
 
       if (action === 'save') {
-        updateSavedOrgs(organization);
+        await updateSavedOrgs(organization);
+        toast.success(`${isSaved ? 'Unsaved' : 'Saved'} ${organization.name}`);
       } else if (action === 'donate') {
         toggleModal();
       }
@@ -77,22 +78,53 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
     [theme]
   );
 
+  // Extracted component for header actions
+  const HeaderActions = () =>
+    user && (
+      <Button
+        color={isSaved ? 'secondary' : 'primary'}
+        onClick={() => handleAction('save')}
+      >
+        {isSaved ? 'Unsave' : 'Save'}
+      </Button>
+    );
+
+  // Extracted component for needs section
+  const NeedsSection = () =>
+    hasNeeds ? (
+      <Collapse
+        in={isExpanded}
+        timeout='auto'
+        unmountOnExit
+      >
+        <Divider />
+        <NeedsList
+          needs={organization.needs.filter((need) => !need.status)}
+          checkedItems={checkedItems}
+          onToggle={handleCheckboxToggle}
+          loggedIn={Boolean(user)}
+        />
+      </Collapse>
+    ) : (
+      <Typography
+        variant='body1'
+        color='text.secondary'
+        textAlign='center'
+        m={2}
+      >
+        No current needs.
+      </Typography>
+    );
+
+  const hasNeeds = organization.needs.length > 0;
+
   return (
     <>
       <Card sx={cardStyles}>
         <CardHeader
           title={organization.name}
           subheader={organization.location}
-          action={
-            user && (
-              <Button
-                color={isSaved ? 'secondary' : 'primary'}
-                onClick={() => handleAction('save')}
-              >
-                {isSaved ? 'Unsave' : 'Save'}
-              </Button>
-            )
-          }
+          action={<HeaderActions />}
         />
         <CardContent>
           <Typography
@@ -105,22 +137,25 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
             size='small'
             href={organization.website}
             target='_blank'
+            sx={{ mt: 1 }}
           >
             Visit Website
           </Button>
         </CardContent>
         <CardActions>
           {hasNeeds && (
-            <Button onClick={toggleExpand}>
+            <Button
+              onClick={toggleExpand}
+              startIcon={isExpanded ? <ExpandLess /> : <ExpandMore />}
+            >
               {isExpanded ? 'Hide Needs' : 'Show Needs'}
-              {isExpanded ? <ExpandLess /> : <ExpandMore />}
             </Button>
           )}
-          {organization.loanable && <Button variant='outlined'>Loan</Button>}
           {hasNeeds && user && (
             <Button
               variant='contained'
               onClick={() => handleAction('donate')}
+              disabled={checkedItemsList.length === 0}
             >
               Donate
             </Button>
@@ -129,36 +164,12 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
             open={isModalOpen}
             onClose={toggleModal}
             organization={organization}
-            selectedNeeds={checkedItemsList}
-            donor={user as DonorProfile}
+            selectedNeeds={checkedItemsList.map((need) => need.itemName)}
+            donor={(user as DonorProfile) ?? {}}
           />
         </CardActions>
-        {hasNeeds ? (
-          <>
-            <Collapse
-              in={isExpanded}
-              timeout='auto'
-              unmountOnExit
-            >
-              <Divider />
-              <NeedsList
-                needs={organization.needs}
-                checkedItems={checkedItems}
-                onToggle={handleCheckboxToggle}
-              />
-            </Collapse>
-          </>
-        ) : (
-          <Typography
-            variant='body1'
-            color='text.secondary'
-            m={2}
-          >
-            No current needs.
-          </Typography>
-        )}
+        <NeedsSection />
       </Card>
-
       <RoleSelectionModal
         open={roleDialogOpen}
         onClose={toggleRoleDialog}

@@ -101,6 +101,18 @@ const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
               >
                 {dayjs(event.date).format('MMMM D, YYYY, h:mm A')}
               </Typography>
+
+              <Typography>
+                {event.supplies.map((supply, index) => (
+                  <Typography
+                    key={index}
+                    variant='caption'
+                    color='text.secondary'
+                  >
+                    {supply.quantityProvided} provided
+                  </Typography>
+                ))}
+              </Typography>
             </Box>
           ))
         ) : (
