@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 
-import OrgNeedsList from './OrgNeedsList';
+import OrgNeedsList from './NeedList';
 import ProfileCard from './ProfileCard';
 
 import useUser from '@/hooks/useUser';
@@ -23,13 +23,6 @@ const OrganizationDashboard = () => {
 
   return (
     <Box sx={{ padding: 3 }}>
-      <Typography
-        variant='h4'
-        sx={{ fontWeight: 'bold', mb: 3 }}
-      >
-        Organization&apos;s Profile
-      </Typography>
-
       <ProfileCard organization={organization} />
       <OrgNeedsList organization={organization} />
     </Box>
