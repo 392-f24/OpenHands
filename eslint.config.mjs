@@ -3,7 +3,12 @@ import { zlAsicaTsReactConfig } from 'eslint-config-zl-asica';
 export default [
   ...zlAsicaTsReactConfig,
   {
-    ignores: ['vite-env.d.ts', 'prettier.config.cjs', 'eslint.config.mjs'],
+    ignores: [
+      'vite-env.d.ts',
+      'prettier.config.cjs',
+      'eslint.config.mjs',
+      'dist',
+    ],
   },
   {
     files: ['**/*.{ts,tsx}'],

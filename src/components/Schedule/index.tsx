@@ -9,7 +9,7 @@ import {
   Button,
   IconButton,
 } from '@mui/material';
-import EventIcon from '@mui/icons-material/Event';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
@@ -75,9 +75,9 @@ const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
           Events for {selectedDate?.format('MMMM D, YYYY')}:
         </Typography>
         {eventsForSelectedDate.length > 0 ? (
-          eventsForSelectedDate.map((event) => (
+          eventsForSelectedDate.map((event_) => (
             <Box
-              key={event.eventId}
+              key={event_.eventId}
               sx={{
                 border: '1px solid',
                 borderColor: 'divider',
@@ -85,34 +85,47 @@ const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
                 p: 2,
                 mb: 2,
                 cursor: 'pointer',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
               }}
-              onClick={() => handleEventClick(event)}
+              onClick={() => handleEventClick(event_)}
             >
-              <Typography
-                variant='subtitle1'
-                fontWeight='bold'
-              >
-                {event.title}
-              </Typography>
-              <Typography variant='body2'>{event.description}</Typography>
-              <Typography
-                variant='caption'
-                color='text.secondary'
-              >
-                {dayjs(event.date).format('MMMM D, YYYY, h:mm A')}
-              </Typography>
+              <Box sx={{ flex: 1, mr: 1 }}>
+                <Typography
+                  variant='subtitle1'
+                  fontWeight='bold'
+                >
+                  {event_.title}
+                </Typography>
+                <Typography variant='body2'>{event_.description}</Typography>
+                <Typography
+                  variant='caption'
+                  color='text.secondary'
+                >
+                  {dayjs(event_.date).format('MMMM D, YYYY, h:mm A')}
+                </Typography>
+                <Typography>
+                  {event_.supplies.map((supply, index) => (
+                    <Typography
+                      key={index}
+                      variant='caption'
+                      color='text.secondary'
+                    >
+                      {supply.quantityProvided} provided
+                    </Typography>
+                  ))}
+                </Typography>
+              </Box>
 
-              <Typography>
-                {event.supplies.map((supply, index) => (
-                  <Typography
-                    key={index}
-                    variant='caption'
-                    color='text.secondary'
-                  >
-                    {supply.quantityProvided} provided
-                  </Typography>
-                ))}
-              </Typography>
+              <IconButton
+                color='primary'
+                onClick={() => generateICSFile(event_)}
+                sx={{ fontSize: 12, display: 'flex', flexDirection: 'column' }}
+              >
+                <CalendarMonthIcon fontSize='large' />
+                Add to Calendar
+              </IconButton>
             </Box>
           ))
         ) : (
@@ -171,14 +184,6 @@ const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
                   {supply.itemName} - {supply.quantityProvided} provided
                 </Typography>
               ))}
-              <IconButton
-                color='primary'
-                onClick={() => generateICSFile(selectedEvent)}
-                sx={{ mt: 2 }}
-              >
-                <EventIcon />
-                Export to Calendar
-              </IconButton>
             </>
           )}
         </DialogContent>
