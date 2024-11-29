@@ -18,7 +18,7 @@ import { db } from './firebaseConfig';
 const fetchEventsByIds = async (
   eventIds: string[]
 ): Promise<DonationEvent[]> => {
-  if (eventIds.length === 0) {
+  if (!eventIds?.length) {
     console.info('No event IDs provided.');
     return [];
   }
@@ -27,7 +27,7 @@ const fetchEventsByIds = async (
     const eventsCollection = collection(db, 'events');
     const snapshot = await getDocs(eventsCollection);
 
-    if (snapshot.empty) {
+    if (!snapshot.docs?.length) {
       console.info('No events found in the collection.');
       return [];
     }
