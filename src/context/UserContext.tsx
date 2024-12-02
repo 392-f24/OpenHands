@@ -12,6 +12,7 @@ import {
   updateDocument,
   fetchAllOrganizationProfiles,
   fetchEventsByIds,
+  getOrCreateDocument,
 } from '@/utils/firebase';
 
 interface UserContextType {
@@ -23,6 +24,7 @@ interface UserContextType {
   login: (userType: UserType, navigate: NavigateFunction) => Promise<void>;
   logout: (navigate: NavigateFunction) => Promise<void>;
   updateProfile: (updates: Partial<User>) => Promise<void>;
+  fetchDonorById: (donorId: string) => Promise<DonorProfile | undefined>;
 }
 
 const UserContext = createContext<UserContextType>({} as UserContextType);
@@ -122,6 +124,31 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
       alert('Profile update failed. Please try again.');
     }
   };
+  /**
+   * Fetch donor profile using `getOrCreateDocument`.
+   *
+   * @param donorId - The UID of the donor.
+   * @returns The donor profile if it exists
+   */
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  const fetchDonorById = async (
+    donorId: string
+  ): Promise<DonorProfile | undefined> => {
+    // Default donor data, used only if the document does not exist
+    const defaultDonorData: DonorProfile = {
+      uid: donorId,
+      name: 'Unknown Donor', // Placeholder name
+      email: '',
+      profilePic: '',
+      joinedEvents: [],
+      providedSupplies: [],
+      saved: [],
+      role: 'donor',
+      createdAt: new Date().toISOString(), // Add the createdAt field
+    };
+
+    return await getOrCreateDocument<DonorProfile>(donorId, defaultDonorData);
+  };
 
   return (
     <UserContext.Provider
@@ -134,6 +161,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
         login,
         logout,
         updateProfile,
+        fetchDonorById,
       }}
     >
       {loading ? <LoadingCircle /> : children}
