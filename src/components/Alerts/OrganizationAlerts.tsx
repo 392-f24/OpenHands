@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -13,39 +12,7 @@ import dayjs from 'dayjs';
 import { useUser } from '@/hooks';
 
 const OrganizationAlerts = () => {
-  const { user, events, fetchDonorById } = useUser();
-  const [donorNames, setDonorNames] = useState<Record<string, string>>({}); // Store donor names by donorId
-
-  // Fetch donor names when events change
-  useEffect(() => {
-    const fetchDonorNames = async () => {
-      const namesMap: Record<string, string> = {};
-
-      for (const event of events) {
-        if (!namesMap[event.donorId]) {
-          const donor = await fetchDonorById(event.donorId); // Fetch donor by ID
-          namesMap[event.donorId] = donor?.name || 'Unknown Donor';
-        }
-      }
-
-      setDonorNames(namesMap); // Update state with donor names
-    };
-
-    if (events.length > 0) {
-      fetchDonorNames();
-    }
-  }, [events, fetchDonorById]);
-
-  if (!user || user.role !== 'organization') {
-    return (
-      <Typography
-        variant='h5'
-        textAlign='center'
-      >
-        You are not authorized to view this page.
-      </Typography>
-    );
-  }
+  const { events } = useUser();
 
   return (
     <Box sx={{ padding: 3 }}>
@@ -73,7 +40,7 @@ const OrganizationAlerts = () => {
                 sx={{ mb: 1 }}
               >
                 <strong>Donor:</strong>{' '}
-                {donorNames[event.donorId] || 'Loading...'}{' '}
+                {event.title.split('from')[1].trim() || 'Loading...'}{' '}
                 {/* Display donor name */}
               </Typography>
               <Typography
