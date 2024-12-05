@@ -1,9 +1,12 @@
-import useUser from './useUser';
+import { useEventStore, useUserStore } from '@/stores';
 
 import { updateEvent, updateDocument } from '@/utils/firebase';
 
 const useEvents = () => {
-  const { user, events, setEvents, updateProfile } = useUser();
+  const events = useEventStore((store) => store.events);
+  const setEvents = useEventStore((store) => store.setEvents);
+  const user = useUserStore((state) => state.user);
+  const updateProfile = useUserStore((state) => state.updateProfile);
 
   if (!user) {
     return {

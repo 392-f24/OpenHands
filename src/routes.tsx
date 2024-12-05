@@ -5,28 +5,33 @@ import Schedule from '@/pages/Schedule';
 import Saved from '@/pages/Saved';
 import Alerts from '@/pages/Alerts';
 
-import { ProtectedRoute } from '@/components/common';
+import { ProtectedRoute, Layout } from '@/components/common';
 
 const AppRoutes = () => {
   const routeConfig = [
-    { path: '/schedule', element: <Schedule /> },
-    { path: '/saved', element: <Saved /> },
-    { path: '/alerts', element: <Alerts /> },
+    { path: 'schedule', element: <Schedule /> },
+    { path: 'saved', element: <Saved /> },
+    { path: 'alerts', element: <Alerts /> },
   ];
 
   return (
     <Routes>
       <Route
         path='/'
-        element={<Home />}
-      />
-      {routeConfig.map(({ path, element }) => (
+        element={<Layout />}
+      >
         <Route
-          key={path}
-          path={path}
-          element={<ProtectedRoute element={element} />}
+          index
+          element={<Home />}
         />
-      ))}
+        {routeConfig.map(({ path, element }) => (
+          <Route
+            key={path}
+            path={path}
+            element={<ProtectedRoute element={element} />}
+          />
+        ))}
+      </Route>
     </Routes>
   );
 };

@@ -5,14 +5,14 @@ import { toast } from 'sonner';
 
 import EditProfileDialog from './EditProfileDialog';
 
-import { useUser } from '@/hooks';
+import { useUserStore } from '@/stores';
 
 interface ProfileCardProps {
   organization: OrganizationProfile;
 }
 
 const ProfileCard = ({ organization }: ProfileCardProps) => {
-  const { updateProfile } = useUser();
+  const updateProfile = useUserStore((state) => state.updateProfile);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [currentProfile, setCurrentProfile] = useState(organization);
 

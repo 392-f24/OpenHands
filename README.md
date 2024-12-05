@@ -4,19 +4,24 @@
 
 ## Table of Contents
 
-1. [File Structure and Logic](#1-file-structure-and-logic)
-2. [Keeping Up-to-Date with `origin/main`](#2-keeping-your-work-up-to-date-with-originmain)
-3. [Typescript](#3-typescript)
-   - [Global Types](#1-global-types-in-typesdts)
-   - [Local Types](#2-local-types-definition)
-   - [Interfaces and props](#3-interfaces-and-props)
-   - [`import type` Instead of `import`](#4-import-type-instead-of-import)
-4. [Context](#4-context)
-   - [What is Context?](#1-what-is-context)
-   - [Why Use Context Instead of Hooks?](#2-why-use-context-instead-of-hooks)
-   - [How to Use UserContext](#3-how-to-use-usercontext)
-     - [Accessing User Data](#accessing-user-data)
-     - [Updating User Data](#updating-user-data)
+- [OpenHands - Red Team](#openhands---red-team)
+  - [Table of Contents](#table-of-contents)
+  - [1. File Structure and Logic](#1-file-structure-and-logic)
+  - [2. Keeping Your Work Up-to-Date with `origin/main`](#2-keeping-your-work-up-to-date-with-originmain)
+    - [Step 1: Create a New Feature Branch](#step-1-create-a-new-feature-branch)
+    - [Step 2: Update Your Local `main` with `origin/main`](#step-2-update-your-local-main-with-originmain)
+    - [Step 3: Rebase Your Feature Branch onto the Updated `main`](#step-3-rebase-your-feature-branch-onto-the-updated-main)
+  - [3. TypeScript](#3-typescript)
+    - [1. Global Types in `types.d.ts`](#1-global-types-in-typesdts)
+    - [2. Local Types Definition](#2-local-types-definition)
+    - [3. Interfaces and props](#3-interfaces-and-props)
+    - [4. `import type` Instead of `import`](#4-import-type-instead-of-import)
+  - [4. Zustand](#4-zustand)
+    - [1. What is Zustand?](#1-what-is-zustand)
+    - [2. How to Use Zustand](#2-how-to-use-zustand)
+      - [Accessing Global State](#accessing-global-state)
+      - [Updating State](#updating-state)
+    - [3. Benefits of Zustand Over Context](#3-benefits-of-zustand-over-context)
 
 ## 1. File Structure and Logic
 
@@ -26,28 +31,25 @@ This project uses a component-based structure with a focus on clear separation o
 .
 ├── LICENSE
 ├── README.md                  # Project documentation and usage guide
-├── prettier.config.cjs        # Prettier configuration file
-├── eslint.config.mjs          # Eslint configuration file
 ├── vite.config.ts             # Vite configuration file
 ├── tsconfig.json              # Typescript config file
 ├── firebase.json              # Firebase configuration for hosting
 ├── package.json               # Dependencies
 └── src                        # Source code
     ├── components             # Shared components and features
-    │   └── common             # Common components used across the app
-    |   └── Home               # Home page components
-    |   └── Me                 # Me page components
-    ├── context                # Context for managing global app state
-    │   └── UserContext.jsx    # Provides user authentication data globally
+    │   ├── common             # Common components used across the app
+    │   ├── Home               # Home page components
+    │   ├── Me                 # Me page components
+    │   └── ...                # Other pages' components
+    ├── stores                 # Zustand related global state management
     ├── hooks                  # Custom hooks for specialized logic
-    │   └── useUser            # Use data from the global context.
     ├── pages                  # Application pages
     ├── utils                  # Utility functions and Firebase configurations
     ├── styles                 # Styles.
-    └── types.d.ts             # Global types define here (such as schemas).
+    └── types                  # Global types define here (such as schemas).
 ```
 
-The main components and utilities are organized under `src/components` and `src/utils`, while `UserContext` manages user state globally to avoid redundant data fetching.
+The main components and utilities are organized under `src/components` and `src/utils`.
 
 ## 2. Keeping Your Work Up-to-Date with `origin/main`
 
@@ -245,57 +247,90 @@ const useUser = () => {
 
 Here, `import type { UserContextType }` indicates that `UserContextType` is used only for type checking, not at runtime. This avoids additional runtime imports and helps with bundling efficiency.
 
-## 4. Context
+## 4. Zustand
 
-### 1. What is Context?
+### 1. What is Zustand?
 
-Context is a React feature that enables data sharing across multiple components without needing to pass props manually at every level. It's especially useful for managing global states, like user authentication data, that are needed by many components.
+`Zustand` is a lightweight state management library for React that uses a centralized store to manage global state. Unlike `Context`, which triggers a re-render of all components that consume it whenever the state changes, `zustand` only updates the components that subscribe to the specific state slice. This makes it more efficient and scalable for managing complex or frequently changing global states, such as user authentication data.
 
-### 2. Why Use Context Instead of Hooks?
+### 2. How to Use Zustand
 
-In our previous `StudyBuddy` project, we relied on hooks to fetch user data directly from Firebase. This led to extremely high read counts (thousands of reads per second) whenever users navigated across components, quickly exceeding Firebase’s free limits and degrading performance. By centralizing user data with `UserContext`, data is fetched only once per session and remains available globally, reducing Firebase reads and data-fetching costs.
+#### Accessing Global State
 
-### 3. How to Use UserContext
+1. **Enable Zustand Store**: Zustand stores are imported and initialized once for the entire application. For example, the `user` store:
 
-#### Accessing User Data
+   ```tsx
+   import { useUserStore } from '@/stores';
 
-1. **Enable Global UserContext**: `UserProvider` has already been implemented to wrap the main application in `App.jsx`. This enables `UserContext` throughout the app.
+   const App = () => {
+     const initializeAuthListener = useUserStore(
+       (state) => state.initializeAuthListener
+     );
 
-   ```jsx
-   import { UserProvider } from '@/contexts/UserContext';
+     useEffect(() => {
+       const unsubscribe = initializeAuthListener();
+       return () => unsubscribe(); // Cleanup listener on unmount
+     }, [initializeAuthListener]);
 
-   const App = () => <UserProvider>{/* App Components */}</UserProvider>;
+     return <>{/* App Components */}</>;
+   };
    ```
 
-2. **Access User Data in Components**: Use the `useUser` hook to access user data (anything inside their profile you can all access just by e.g. `user.goals`) and authentication functions in any component:
+2. **Access State in Components**: Use zustand hooks to fetch only the state you need. This ensures efficient re-rendering.
 
-   ```jsx
-   import useUser from '@/hooks/useUser';
+   ```tsx
+   import { useUserStore } from '@/stores';
 
    const MyComponent = () => {
-     {
-       /* You can decide what to use from `useUser` */
-     }
-     const { user, loading, handleSignIn, handleSignOut } = useUser();
+     const user = useUserStore((state) => state.user);
+     const loading = useUserStore((state) => state.loading);
 
      return user ? (
        <div>
          <h1>Welcome, {user.displayName}</h1>
-         <button onClick={handleSignOut}>Sign Out</button>
+         <button onClick={() => useUserStore.getState().logout()}>
+           Sign Out
+         </button>
        </div>
+     ) : loading ? (
+       <p>Loading...</p>
      ) : (
-       <button onClick={handleSignIn}>Sign In</button>
+       <button
+         onClick={() =>
+           useUserStore
+             .getState()
+             .login('donor', () => console.log('Logged in'))
+         }
+       >
+         Sign In
+       </button>
      );
    };
    ```
 
-#### Updating User Data
+---
 
-Use the `updateProfile` function to update user profile information:
+#### Updating State
 
-```jsx
-const { updateProfile } = useUser();
-updateProfile({ displayName: 'New Name' });
+To update the user's profile or other states, zustand provides centralized actions that automatically update Firebase and sync the changes with the store:
+
+```tsx
+import useUserStore from '@/stores/useUserStore';
+
+const MyComponent = () => {
+  const updateProfile = useUserStore((state) => state.updateProfile);
+
+  const handleUpdate = () => {
+    updateProfile({ displayName: 'New Name' }); // Updates profile in Firebase and zustand
+  };
+
+  return <button onClick={handleUpdate}>Update Profile</button>;
+};
 ```
 
-The `updateProfile` function accepts an object with updated user fields and syncs them with both the context and Firebase, ensuring efficient data sharing across components and reducing the need for direct database access.
+### 3. Benefits of Zustand Over Context
+
+1. **Better Performance**: Only components subscribing to specific state slices re-render, unlike `Context`, where all consumers re-render.
+2. **Cleaner Code**: Real-time Firebase listeners (`onSnapshot`, `onAuthStateChanged`) are centralized in zustand, simplifying the components.
+3. **Easy Debugging**: Zustand provides utilities like `zustand/middleware` to inspect and persist state.
+4. **Efficient State Sharing**: State is directly accessible anywhere in the app without additional setup (e.g., no need for custom hooks like `useUser`).

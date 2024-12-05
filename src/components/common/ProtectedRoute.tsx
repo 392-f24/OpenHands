@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import type { ReactElement } from 'react';
 
-import { useUser } from '@/hooks';
+import { useUserStore } from '@/stores';
 
 import LoadingCircle from '@/components/common/LoadingCircle';
 
@@ -10,7 +10,8 @@ type ProtectedRouteProps = {
 };
 
 const ProtectedRoute = ({ element }: ProtectedRouteProps) => {
-  const { user, loading } = useUser();
+  const user = useUserStore((state) => state.user);
+  const loading = useUserStore((state) => state.loading);
 
   if (loading) return <LoadingCircle />;
   if (!user) {

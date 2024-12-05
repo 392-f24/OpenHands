@@ -1,51 +1,6 @@
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  setDoc,
-} from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, setDoc } from 'firebase/firestore';
 
 import { db } from './firebaseConfig';
-
-/**
- * Fetch all events by event IDs by filtering the entire events collection.
- *
- * @param eventIds The array of event IDs to fetch.
- * @returns A promise that resolves to an array of DonationEvent.
- */
-const fetchEventsByIds = async (
-  eventIds: string[]
-): Promise<DonationEvent[]> => {
-  if (!eventIds?.length) {
-    console.info('No event IDs provided.');
-    return [];
-  }
-
-  try {
-    const eventsCollection = collection(db, 'events');
-    const snapshot = await getDocs(eventsCollection);
-
-    if (!snapshot.docs?.length) {
-      console.info('No events found in the collection.');
-      return [];
-    }
-
-    // Filter events based on the provided IDs
-    const events: DonationEvent[] = snapshot.docs
-      .filter((doc) => eventIds.includes(doc.id)) // Only keep documents matching the event IDs
-      .map((doc) => ({
-        ...doc.data(),
-        eventId: doc.id,
-      })) as DonationEvent[];
-
-    return events;
-  } catch (error) {
-    console.error('Error fetching events by IDs:', error);
-    throw error;
-  }
-};
 
 /**
  * Add or update an event in the Firestore `events` collection.
@@ -94,4 +49,4 @@ const removeEvent = async (eventId: string): Promise<void> => {
   }
 };
 
-export { fetchEventsByIds, updateEvent, removeEvent };
+export { updateEvent, removeEvent };

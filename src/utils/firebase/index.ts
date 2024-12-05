@@ -1,4 +1,4 @@
 export { loginUser, logoutUser } from './auth';
-export { auth } from './firebaseConfig';
-export { updateDocument, fetchAllOrganizationProfiles } from './firebaseUtils';
-export { fetchEventsByIds, updateEvent, removeEvent } from './eventsUtils';
+export { auth, db } from './firebaseConfig';
+export { updateDocument } from './firebaseUtils';
+export { updateEvent, removeEvent } from './eventsUtils';
