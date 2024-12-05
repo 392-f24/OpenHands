@@ -1,11 +1,20 @@
+import { useEffect } from 'react';
+
 import { useUserStore, useEventStore } from '@/stores';
 
 import ScheduleBase from '@/components/Schedule';
 
 const DonorSchedule = () => {
   const user = useUserStore((state) => state.user);
+  const eventIds = user?.joinedEvents || [];
 
   if (!user) return null;
+
+  useEffect(() => {
+    if (user) {
+      useEventStore.getState().fetchEventsByIds(eventIds);
+    }
+  }, [user]); // Trigger fetch on user change
 
   const events = useEventStore((store) => store.events);
 
