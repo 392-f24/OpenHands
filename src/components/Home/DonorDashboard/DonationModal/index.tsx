@@ -8,7 +8,7 @@ import DeliveryMethodSelector from './DeliveryMethodSelector';
 import TimeSelector from './TimeSelector';
 import { DeliveryMethod } from './types';
 
-import { useEvents } from '@/hooks';
+import { useEventStore } from '@/stores';
 
 import prepareDonationData from '@/utils/eventsUtils';
 
@@ -27,7 +27,7 @@ const DonationModal = ({
   selectedNeeds,
   donor,
 }: DonationModalProps) => {
-  const { addDonationEvent } = useEvents();
+  const addDonationEvent = useEventStore((state) => state.addDonationEvent);
   const [method, setMethod] = useState<DeliveryMethod>(DeliveryMethod.DROP_OFF);
   const [selectedTime, setSelectedTime] = useState<dayjs.Dayjs | null>(null);
   const [providedQuantities, setProvidedQuantities] = useState<{

@@ -2,17 +2,24 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { collection, getDocs } from 'firebase/firestore';
 
-import { db } from '@/utils/firebase';
+import useUserStore from './userStore';
+
+import { db, updateDocument, updateEvent } from '@/utils/firebase';
 
 interface EventState {
   events: DonationEvent[];
   setEvents: (events: DonationEvent[]) => void;
   fetchEventsByIds: (eventIds: string[]) => Promise<void>;
+  addDonationEvent: (
+    event: DonationEvent,
+    donorUpdates: Partial<DonorProfile>,
+    organizationUpdates: Partial<OrganizationProfile>
+  ) => Promise<void>;
 }
 
 const useEventStore = create<EventState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       events: [],
 
       setEvents: (events) => set({ events }),
@@ -43,6 +50,37 @@ const useEventStore = create<EventState>()(
         } catch (error) {
           console.error('Error fetching events by IDs:', error);
           throw error;
+        }
+      },
+
+      addDonationEvent: async (
+        event,
+        donorUpdates,
+        organizationUpdates
+      ): Promise<void> => {
+        try {
+          if (organizationUpdates.uid) {
+            await updateDocument(
+              'organization',
+              organizationUpdates.uid,
+              organizationUpdates
+            );
+          }
+
+          if (donorUpdates.uid) {
+            const updateProfile = useUserStore((state) => state.updateProfile);
+            await updateProfile(donorUpdates);
+          }
+
+          await updateEvent(event);
+
+          const currentEvents = get().events;
+          set({ events: [...currentEvents, event] });
+
+          console.info(`Donation event ${event.eventId} created successfully.`);
+        } catch (error) {
+          console.error('Error adding donation event:', error);
+          throw new Error('Failed to create donation event.');
         }
       },
     }),

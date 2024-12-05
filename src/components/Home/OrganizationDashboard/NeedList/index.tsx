@@ -7,7 +7,7 @@ import NeedDialog from './NeedDialog';
 import NeedListItem from './NeedListItem';
 import EmptyStateMessage from './EmptyStateMessage';
 
-import useNeeds from '@/hooks/useNeeds';
+import { useNeeds } from '@/hooks';
 
 interface NeedsListProps {
   organization: OrganizationProfile;
