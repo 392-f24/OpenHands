@@ -67,6 +67,9 @@ const useUserStore = create<UserState>()(
         try {
           set({ loading: true });
           await logoutUser(navigate);
+          const eventStore = useEventStore.getState();
+          eventStore.setEvents([]);
+
           set({ user: undefined, error: null });
         } catch (error) {
           console.error('Error during logout:', error);
