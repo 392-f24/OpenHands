@@ -68,8 +68,8 @@ const useEventStore = create<EventState>()(
           }
 
           if (donorUpdates.uid) {
-            const updateProfile = useUserStore((state) => state.updateProfile);
-            await updateProfile(donorUpdates);
+            const userStore = useUserStore.getState();
+            await userStore.updateProfile(donorUpdates);
           }
 
           await updateEvent(event);
