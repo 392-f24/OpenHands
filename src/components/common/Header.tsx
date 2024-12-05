@@ -11,12 +11,14 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useToggle } from '@zl-asica/react';
 
-import { useUser } from '@/hooks';
+import { useUserStore } from '@/stores';
 
 import { RoleSelectionModal, ConfirmationDialog } from '@/components/common';
 
 const Header = () => {
-  const { user, logout } = useUser();
+  const user = useUserStore((state) => state.user);
+  const logout = useUserStore((state) => state.logout);
+
   const location = useLocation();
   const navigate = useNavigate();
 

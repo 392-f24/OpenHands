@@ -7,7 +7,7 @@ import NeedDialog from './NeedDialog';
 import NeedListItem from './NeedListItem';
 import EmptyStateMessage from './EmptyStateMessage';
 
-import useNeeds from '@/hooks/useNeeds';
+import { useNeeds } from '@/hooks';
 
 interface NeedsListProps {
   organization: OrganizationProfile;
@@ -24,7 +24,7 @@ const OrgNeedsList = ({ organization }: NeedsListProps) => {
       try {
         if (selectedNeed) {
           // Edit existing need
-          await updateNeed(organization.uid, selectedNeed.itemName, need);
+          await updateNeed(organization, selectedNeed.itemName, need);
           setNeeds((prevNeeds) =>
             prevNeeds.map((n) =>
               n.itemName === selectedNeed.itemName ? need : n
@@ -34,7 +34,7 @@ const OrgNeedsList = ({ organization }: NeedsListProps) => {
         } else {
           // Add new need
           await addNeed(
-            organization.uid,
+            organization,
             need.itemName,
             need.quantityNeeded,
             need.pickup,

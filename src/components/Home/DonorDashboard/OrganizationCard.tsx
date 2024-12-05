@@ -10,14 +10,15 @@ import {
 } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import { lighten, useTheme } from '@mui/material/styles';
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useToggle } from '@zl-asica/react';
 import { toast } from 'sonner';
 
 import DonationModal from './DonationModal';
 import NeedsList from './NeedList';
 
-import { useSavedOrgs, useUser } from '@/hooks';
+import { useSavedOrgs } from '@/hooks';
+import { useUserStore } from '@/stores';
 
 import { RoleSelectionModal } from '@/components/common';
 
@@ -27,14 +28,17 @@ interface OrganizationCardProps {
 
 const OrganizationCard = ({ organization }: OrganizationCardProps) => {
   const theme = useTheme();
-  const { user } = useUser();
+  const user = useUserStore((state) => state.user);
+
   const { savedOrgs, updateSavedOrgs } = useSavedOrgs();
   const [isModalOpen, toggleModal] = useToggle();
   const [isExpanded, toggleExpand] = useToggle();
   const [roleDialogOpen, toggleRoleDialog] = useToggle();
-  const [checkedItems, setCheckedItems] = useState<boolean[]>(
-    organization.needs?.map(() => false) ?? []
-  );
+  const [checkedItems, setCheckedItems] = useState<boolean[]>([]);
+
+  useEffect(() => {
+    setCheckedItems(organization.needs?.map(() => false) ?? []);
+  }, [organization.needs]);
 
   const isSaved = useMemo(
     () => savedOrgs.some((org) => org.uid === organization.uid),

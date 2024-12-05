@@ -1,9 +1,9 @@
-import { useUser } from '@/hooks';
+import { useUserStore } from '@/stores';
 
 import { DonorAlerts, OrganizationAlerts } from '@/components/Alerts';
 
 const Alerts = () => {
-  const { user } = useUser();
+  const user = useUserStore((state) => state.user);
 
   if (user && user.role === 'organization') {
     return <OrganizationAlerts />;

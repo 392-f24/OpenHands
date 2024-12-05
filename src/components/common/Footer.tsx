@@ -7,7 +7,7 @@ import {
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 
-import { useUser } from '@/hooks';
+import { useUserStore } from '@/stores';
 
 // Get the index of the page based on the path
 const getPageIndex = (path: string) => {
@@ -31,7 +31,7 @@ const getPageIndex = (path: string) => {
 };
 
 const Footer = () => {
-  const { user } = useUser();
+  const user = useUserStore((state) => state.user);
   const userType = user?.role || 'guest';
   const location = useLocation();
 

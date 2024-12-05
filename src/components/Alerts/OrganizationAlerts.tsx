@@ -9,10 +9,10 @@ import {
 } from '@mui/material';
 import dayjs from 'dayjs';
 
-import { useUser } from '@/hooks';
+import { useEventStore } from '@/stores';
 
 const OrganizationAlerts = () => {
-  const { events } = useUser();
+  const events = useEventStore((store) => store.events);
 
   return (
     <Box sx={{ padding: 3 }}>

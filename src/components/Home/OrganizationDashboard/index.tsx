@@ -3,10 +3,10 @@ import { Box, Typography } from '@mui/material';
 import OrgNeedsList from './NeedList';
 import ProfileCard from './ProfileCard';
 
-import useUser from '@/hooks/useUser';
+import { useUserStore } from '@/stores';
 
 const OrganizationDashboard = () => {
-  const { user } = useUser();
+  const user = useUserStore((state) => state.user);
 
   if (!user || user.role !== 'organization') {
     return (

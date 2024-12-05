@@ -1,16 +1,36 @@
 import { Box, Typography } from '@mui/material';
 import { filter, lowerCase, some } from 'es-toolkit/compat';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 import OrganizationCard from './OrganizationCard';
 
-import { useUser } from '@/hooks';
+import { useOrganizationStore } from '@/stores';
 
-import { SearchBar } from '@/components/common';
+import { SearchBar, LoadingCircle } from '@/components/common';
 
 const DonorDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const { organizationProfiles } = useUser();
+  const {
+    organizationProfiles,
+    fetchProfiles,
+    subscribeToProfiles,
+    loading,
+    error,
+  } = useOrganizationStore();
+
+  useEffect(() => {
+    fetchProfiles();
+    const unsubscribe = subscribeToProfiles;
+
+    return () => unsubscribe && unsubscribe();
+  }, [fetchProfiles, subscribeToProfiles]);
+
+  if (loading) return <LoadingCircle />;
+  if (error) {
+    toast.error(error);
+    return <p>{error}</p>;
+  }
 
   // Filtered organizations based on search query
   const filteredOrganizations = filter(organizationProfiles, (org) => {

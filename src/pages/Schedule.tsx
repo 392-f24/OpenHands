@@ -1,13 +1,13 @@
-import { useUser } from '@/hooks';
+import { useUserStore, useEventStore } from '@/stores';
 
 import ScheduleBase from '@/components/Schedule';
 
 const DonorSchedule = () => {
-  const { user, events } = useUser();
+  const user = useUserStore((state) => state.user);
 
-  if (!user || !events) {
-    return null;
-  }
+  if (!user) return null;
+
+  const events = useEventStore((store) => store.events);
 
   const title =
     user.role === 'donor'

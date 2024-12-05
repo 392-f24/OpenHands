@@ -1,7 +1,8 @@
-import useUser from './useUser';
+import { useUserStore } from '@/stores';
 
 const useSavedOrgs = () => {
-  const { user, updateProfile } = useUser();
+  const user = useUserStore((state) => state.user);
+  const updateProfile = useUserStore((state) => state.updateProfile);
 
   if (!user || user.role !== 'donor') {
     return {

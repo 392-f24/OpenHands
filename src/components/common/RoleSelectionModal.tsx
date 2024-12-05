@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import CustomDialog from './CustomDialog';
 
-import { useUser } from '@/hooks';
+import { useUserStore } from '@/stores';
 
 interface RoleSelectionModalProps {
   open: boolean;
@@ -10,7 +10,7 @@ interface RoleSelectionModalProps {
 }
 
 const RoleSelectionModal = ({ open, onClose }: RoleSelectionModalProps) => {
-  const { login } = useUser();
+  const login = useUserStore((state) => state.login);
   const navigate = useNavigate();
 
   return (

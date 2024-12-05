@@ -1,10 +1,10 @@
-import { useUser } from '@/hooks';
+import { useUserStore } from '@/stores';
 
 import OrganizationDashboard from '@/components/Home/OrganizationDashboard';
 import DonorDashboard from '@/components/Home/DonorDashboard';
 
 const Home = () => {
-  const { user } = useUser();
+  const user = useUserStore((state) => state.user);
 
   if (user && user.role === 'organization') {
     return <OrganizationDashboard />;

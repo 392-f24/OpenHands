@@ -1,8 +1,8 @@
-import useUser from './useUser';
+import { useUserStore } from '@/stores';
 
 interface UseNeedsHook {
   addNeed: (
-    organizationId: string,
+    organization: OrganizationProfile,
     itemName: string,
     quantityNeeded: number,
     pickup?: boolean,
@@ -10,7 +10,7 @@ interface UseNeedsHook {
     returnDate?: string
   ) => Promise<void>;
   updateNeed: (
-    organizationId: string,
+    organization: OrganizationProfile,
     itemName: string,
     updates: Partial<Supply>
   ) => Promise<void>;
@@ -29,32 +29,16 @@ const sanitizeNeeds = (needs: Supply[]): Supply[] =>
   }));
 
 const useNeeds = (): UseNeedsHook => {
-  const { organizationProfiles, updateProfile } = useUser();
-
-  const findOrganizationProfile = (
-    organizationId: string
-  ): OrganizationProfile | null => {
-    const orgProfile = organizationProfiles.find(
-      (org) => org.uid === organizationId
-    );
-    if (!orgProfile) {
-      console.error(`Organization with ID ${organizationId} not found.`);
-      return null;
-    }
-    return orgProfile;
-  };
+  const updateProfile = useUserStore((state) => state.updateProfile);
 
   const addNeed = async (
-    organizationId: string,
+    organization: OrganizationProfile,
     itemName: string,
     quantityNeeded: number,
     pickup = false,
     loanable = false,
     returnDate?: string
   ): Promise<void> => {
-    const orgProfile = findOrganizationProfile(organizationId);
-    if (!orgProfile) return;
-
     const newNeed: Supply = {
       itemName,
       quantityNeeded,
@@ -68,7 +52,7 @@ const useNeeds = (): UseNeedsHook => {
 
     try {
       const updatedNeeds = sanitizeNeeds([
-        ...(orgProfile.needs || []),
+        ...(organization.needs || []),
         newNeed,
       ]);
       await updateProfile({ needs: updatedNeeds });
@@ -79,17 +63,16 @@ const useNeeds = (): UseNeedsHook => {
   };
 
   const updateNeed = async (
-    organizationId: string,
+    organization: OrganizationProfile,
     itemName: string,
     updates: Partial<Supply>
   ): Promise<void> => {
-    const orgProfile = findOrganizationProfile(organizationId);
-    if (!orgProfile) return;
-
-    if (!orgProfile.needs) return;
+    if (!organization.needs) {
+      organization.needs = [];
+    }
 
     try {
-      const needIndex = orgProfile.needs.findIndex(
+      const needIndex = organization.needs.findIndex(
         (need) => need.itemName === itemName
       );
 
@@ -98,7 +81,7 @@ const useNeeds = (): UseNeedsHook => {
         return;
       }
 
-      const updatedNeeds = [...orgProfile.needs];
+      const updatedNeeds = [...organization.needs];
       updatedNeeds[needIndex] = { ...updatedNeeds[needIndex], ...updates };
       const sanitizedNeeds = sanitizeNeeds(updatedNeeds);
 
