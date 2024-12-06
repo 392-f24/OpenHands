@@ -21,7 +21,7 @@ const useUserStore = create<UserState>()(
   persist(
     (set, get) => ({
       user: undefined,
-      loading: true,
+      loading: false,
       error: null,
 
       initializeAuthListener: () => {
@@ -30,6 +30,7 @@ const useUserStore = create<UserState>()(
         const unsubscribeAuth = onAuthStateChanged(
           auth,
           async (firebaseUser) => {
+            set({ loading: true });
             if (firebaseUser) {
               const currentUser = get().user;
 
@@ -53,6 +54,8 @@ const useUserStore = create<UserState>()(
       },
 
       login: async (userType, navigate) => {
+        const fetchEventsByIds = useEventStore.getState().fetchEventsByIds;
+
         try {
           set({ loading: true });
           const profile = await loginUser(navigate, userType);
@@ -61,6 +64,10 @@ const useUserStore = create<UserState>()(
               user: { ...profile, role: userType },
               error: null,
             });
+            const currentUser = get().user;
+            if (currentUser && currentUser.joinedEvents?.length > 0) {
+              await fetchEventsByIds(currentUser.joinedEvents);
+            }
           }
         } catch (error) {
           console.error('Error during login:', error);
@@ -76,6 +83,7 @@ const useUserStore = create<UserState>()(
           await logoutUser(navigate);
 
           set({ user: undefined, error: null });
+          useEventStore.getState().setEvents([]);
         } catch (error) {
           console.error('Error during logout:', error);
           set({ error: 'Logout failed. Please try again.' });

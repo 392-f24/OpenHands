@@ -15,18 +15,21 @@ import dayjs from 'dayjs';
 
 import EventsCalendar from './EventsCalendar';
 
+import { useEventStore } from '@/stores';
+
 import {
   generateICSFile,
   generateCombinedICSFile,
 } from '@/utils/generateICSFile';
 
 interface ScheduleBaseProps {
-  events: DonationEvent[];
   title: string;
   description: string;
 }
 
-const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
+const ScheduleBase = ({ title, description }: ScheduleBaseProps) => {
+  const events = useEventStore((store) => store.events);
+
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
   const [selectedEvent, setSelectedEvent] = useState<DonationEvent | null>(
     null
