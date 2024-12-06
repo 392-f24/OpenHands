@@ -1,4 +1,5 @@
 import {
+  Box,
   Card,
   CardContent,
   CardActions,
@@ -7,6 +8,7 @@ import {
   Collapse,
   Typography,
   Divider,
+  Link,
 } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import { lighten, useTheme } from '@mui/material/styles';
@@ -82,16 +84,30 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
     [theme]
   );
 
-  // Extracted component for header actions
-  const HeaderActions = () =>
-    user && (
-      <Button
-        color={isSaved ? 'secondary' : 'primary'}
-        onClick={() => handleAction('save')}
-      >
-        {isSaved ? 'Unsave' : 'Save'}
-      </Button>
-    );
+  const HeaderActions = () => (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-end',
+        mt: 1,
+      }}
+    >
+      {user && (
+        <Button
+          size='small'
+          sx={{
+            width: 'fit-content',
+            backgroundColor: 'primary.light',
+          }}
+          color={isSaved ? 'secondary' : 'primary'}
+          onClick={() => handleAction('save')}
+        >
+          {isSaved ? 'Unsaved' : 'Save'}
+        </Button>
+      )}
+    </Box>
+  );
 
   // Extracted component for needs section
   const NeedsSection = () =>
@@ -127,7 +143,26 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
       <Card sx={cardStyles}>
         <CardHeader
           title={organization.name}
-          subheader={organization.location}
+          subheader={
+            <>
+              {organization.location}
+              <br />
+              <Link
+                href={organization.website}
+                target='_blank'
+                rel='noopener noreferrer'
+                variant='button'
+                sx={{
+                  mt: -1,
+                  textDecoration: 'none',
+                  width: 'fit-content',
+                  textTransform: 'none',
+                }}
+              >
+                Visit Website
+              </Link>
+            </>
+          }
           action={<HeaderActions />}
         />
         <CardContent>
@@ -137,14 +172,6 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
           >
             {organization.description}
           </Typography>
-          <Button
-            size='small'
-            href={organization.website}
-            target='_blank'
-            sx={{ mt: 1 }}
-          >
-            Visit Website
-          </Button>
         </CardContent>
         <CardActions>
           {hasNeeds && (
