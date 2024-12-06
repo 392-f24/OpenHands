@@ -1,4 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
+
+import { useOrganizationStore, useUserStore } from './stores';
 
 import Home from '@/pages/Home';
 import Schedule from '@/pages/Schedule';
@@ -13,6 +17,25 @@ const AppRoutes = () => {
     { path: 'saved', element: <Saved /> },
     { path: 'alerts', element: <Alerts /> },
   ];
+
+  const loading = useUserStore((state) => state.loading);
+  const user = useUserStore((state) => state.user);
+
+  if (!loading && (!user || user.role !== 'organization')) {
+    const subscribeToProfiles = useOrganizationStore(
+      (state) => state.subscribeToProfiles
+    );
+    const error = useOrganizationStore((state) => state.error);
+
+    useEffect(() => {
+      const unsubscribe = subscribeToProfiles;
+
+      return () => unsubscribe && unsubscribe();
+    }, [subscribeToProfiles]);
+    if (error) {
+      toast.error(error);
+    }
+  }
 
   return (
     <Routes>
