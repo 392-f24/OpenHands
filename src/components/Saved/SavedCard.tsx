@@ -1,4 +1,5 @@
 import {
+  Box,
   Card,
   CardContent,
   CardHeader,
@@ -25,13 +26,32 @@ const SavedOrganizationCard: React.FC<{
         title={organization.name}
         subheader={organization.location}
         action={
-          <Button
-            variant='text'
-            color='error'
-            onClick={onRemove}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              gap: '0.25rem',
+              mt: 1,
+            }}
           >
-            Remove
-          </Button>
+            <Button
+              size='small'
+              variant='text'
+              color='error'
+              onClick={onRemove}
+            >
+              Unsaved
+            </Button>
+            <Button
+              size='small'
+              sx={{ width: 'fit-content' }}
+              href={organization.website}
+              target='_blank'
+            >
+              Visit Website
+            </Button>
+          </Box>
         }
       />
       <CardContent>
@@ -41,13 +61,6 @@ const SavedOrganizationCard: React.FC<{
         >
           {organization.description}
         </Typography>
-        <Button
-          size='small'
-          href={organization.website}
-          target='_blank'
-        >
-          Visit Website
-        </Button>
       </CardContent>
     </Card>
   );
