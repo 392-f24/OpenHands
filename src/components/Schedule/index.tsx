@@ -9,7 +9,6 @@ import {
   Button,
   IconButton,
 } from '@mui/material';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { FileDownload, CalendarMonth } from '@mui/icons-material';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
