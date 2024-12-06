@@ -1,6 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import { filter, lowerCase, some } from 'es-toolkit/compat';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 import OrganizationCard from './OrganizationCard';
 
@@ -18,43 +17,58 @@ const DonorDashboard = () => {
     (state) => state.organizationProfiles
   );
 
-  // Filtered organizations based on search query
-  const filteredOrganizations = filter(organizationProfiles, (org) => {
-    if (!org.name) return false;
-    const searchTerm = lowerCase(searchQuery);
-    return (
-      lowerCase(org.name).includes(searchTerm) ||
-      lowerCase(org.location).includes(searchTerm) ||
-      some(org.needs, (need) => lowerCase(need).includes(searchTerm))
-    );
-  });
+  const filteredOrganizations = useMemo(() => {
+    return organizationProfiles.filter((org) => {
+      const matchesSearch = searchQuery
+        ? org.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          org.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (org.needs || []).some((need) =>
+            need.itemName.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+        : true;
 
-  //filtering organizations based on needs and description
-  const filteredByNeedsAndDescription = filter(filteredOrganizations, (org) => {
-    const matchesNeeds = needsQuery
-      ? some(org.needs, (need) =>
-          lowerCase(need.itemName || '').includes(lowerCase(needsQuery))
-        )
-      : true;
+      const matchesNeeds = needsQuery
+        ? (org.needs || []).some((need) =>
+            need.itemName.toLowerCase().includes(needsQuery.toLowerCase())
+          )
+        : true;
 
-    const matchesDescription = descriptionQuery
-      ? lowerCase(org.description || '').includes(lowerCase(descriptionQuery))
-      : true;
+      const matchesDescription = descriptionQuery
+        ? org.description
+            ?.toLowerCase()
+            .includes(descriptionQuery.toLowerCase())
+        : true;
 
-    const matchesLocation = locationQuery
-      ? lowerCase(org.location || '').includes(lowerCase(locationQuery))
-      : true;
+      const matchesLocation = locationQuery
+        ? org.location.toLowerCase().includes(locationQuery.toLowerCase())
+        : true;
 
-    return matchesNeeds && matchesDescription && matchesLocation;
-  });
+      return (
+        matchesSearch && matchesNeeds && matchesDescription && matchesLocation
+      );
+    });
+  }, [
+    organizationProfiles,
+    searchQuery,
+    needsQuery,
+    descriptionQuery,
+    locationQuery,
+  ]);
 
   return organizationProfiles.length > 0 ? (
-    <div>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       <Box
-        display='flex'
-        gap={2}
-        alignItems='center'
-        mb={3}
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
       >
         <SearchBar onSearchChange={setSearchQuery} />
         <Filters
@@ -67,15 +81,13 @@ const DonorDashboard = () => {
         />
       </Box>
 
-      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-        {filteredByNeedsAndDescription.map((org) => (
-          <OrganizationCard
-            organization={org}
-            key={org.uid}
-          />
-        ))}
-      </Box>
-    </div>
+      {filteredOrganizations.map((org) => (
+        <OrganizationCard
+          organization={org}
+          key={org.uid}
+        />
+      ))}
+    </Box>
   ) : (
     <Typography
       variant='body1'
