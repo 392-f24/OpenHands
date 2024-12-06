@@ -29,12 +29,7 @@ const SavedOrganizationCard: React.FC<{
           <Box
             sx={{
               display: 'flex',
-              flexDirection: {
-                xs: 'column',
-                sm: 'column',
-                md: 'column',
-                lg: 'row',
-              },
+              flexDirection: 'column',
               alignItems: 'flex-end',
               gap: '0.25rem',
               mt: 1,
@@ -46,7 +41,7 @@ const SavedOrganizationCard: React.FC<{
               color='error'
               onClick={onRemove}
             >
-              Remove
+              Unsaved
             </Button>
             <Button
               size='small'

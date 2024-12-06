@@ -8,6 +8,7 @@ import {
   Collapse,
   Typography,
   Divider,
+  Link,
 } from '@mui/material';
 import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import { lighten, useTheme } from '@mui/material/styles';
@@ -83,35 +84,28 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
     [theme]
   );
 
-  // Extracted component for header actions
   const HeaderActions = () => (
     <Box
       sx={{
         display: 'flex',
-        flexDirection: { xs: 'column', sm: 'column', md: 'column', lg: 'row' },
+        flexDirection: 'column',
         alignItems: 'flex-end',
-        gap: '0.25rem',
         mt: 1,
       }}
     >
       {user && (
         <Button
           size='small'
-          sx={{ width: 'fit-content' }}
+          sx={{
+            width: 'fit-content',
+            backgroundColor: 'primary.light',
+          }}
           color={isSaved ? 'secondary' : 'primary'}
           onClick={() => handleAction('save')}
         >
-          {isSaved ? 'Unsave' : 'Save'}
+          {isSaved ? 'Unsaved' : 'Save'}
         </Button>
       )}
-      <Button
-        size='small'
-        sx={{ width: 'fit-content' }}
-        href={organization.website}
-        target='_blank'
-      >
-        Visit Website
-      </Button>
     </Box>
   );
 
@@ -149,7 +143,26 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
       <Card sx={cardStyles}>
         <CardHeader
           title={organization.name}
-          subheader={organization.location}
+          subheader={
+            <>
+              {organization.location}
+              <br />
+              <Link
+                href={organization.website}
+                target='_blank'
+                rel='noopener noreferrer'
+                variant='button'
+                sx={{
+                  mt: -1,
+                  textDecoration: 'none',
+                  width: 'fit-content',
+                  textTransform: 'none',
+                }}
+              >
+                Visit Website
+              </Link>
+            </>
+          }
           action={<HeaderActions />}
         />
         <CardContent>
