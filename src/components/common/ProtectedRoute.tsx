@@ -1,7 +1,8 @@
 import { Typography } from '@mui/material';
-import type { ReactElement } from 'react';
+import { useEffect, type ReactElement } from 'react';
+import { toast } from 'sonner';
 
-import { useUserStore } from '@/stores';
+import { useOrganizationStore, useUserStore } from '@/stores';
 
 import LoadingCircle from '@/components/common/LoadingCircle';
 
@@ -26,6 +27,36 @@ const ProtectedRoute = ({ element }: ProtectedRouteProps) => {
         Please sign in to view this page
       </Typography>
     );
+  }
+
+  if (user.role !== 'organization') {
+    const orgLoading = useOrganizationStore((state) => state.loading);
+    const subscribeToProfiles = useOrganizationStore(
+      (state) => state.subscribeToProfiles
+    );
+    const error = useOrganizationStore((state) => state.error);
+
+    useEffect(() => {
+      const unsubscribe = subscribeToProfiles;
+
+      return () => unsubscribe && unsubscribe();
+    }, [subscribeToProfiles]);
+
+    if (orgLoading) return <LoadingCircle />;
+
+    if (error) {
+      toast.error(error);
+      return (
+        <Typography
+          variant='body1'
+          color='error'
+          align='center'
+          sx={{ mt: 4 }}
+        >
+          {error}
+        </Typography>
+      );
+    }
   }
 
   return element;
