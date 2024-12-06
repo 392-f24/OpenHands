@@ -37,7 +37,12 @@ const EventsCalendar = ({ events, setSelectedDate }: EventsCalendarProps) => {
         key={day.toString()}
         overlap='circular'
         badgeContent={isSelected ? '•' : undefined}
-        color='primary'
+        sx={{
+          '& .MuiBadge-badge': {
+            fontSize: '30px',
+            color: (theme) => theme.palette.primary.main,
+          },
+        }}
       >
         <PickersDay
           {...other}
