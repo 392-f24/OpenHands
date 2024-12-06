@@ -20,22 +20,24 @@ const AppRoutes = () => {
 
   const loading = useUserStore((state) => state.loading);
   const user = useUserStore((state) => state.user);
+  const subscribeToProfiles = useOrganizationStore(
+    (state) => state.subscribeToProfiles
+  );
+  const error = useOrganizationStore((state) => state.error);
 
-  if (!loading && (!user || user.role !== 'organization')) {
-    const subscribeToProfiles = useOrganizationStore(
-      (state) => state.subscribeToProfiles
-    );
-    const error = useOrganizationStore((state) => state.error);
-
-    useEffect(() => {
+  useEffect(() => {
+    if (!loading && (!user || user.role !== 'organization')) {
       const unsubscribe = subscribeToProfiles;
 
       return () => unsubscribe && unsubscribe();
-    }, [subscribeToProfiles]);
+    }
+  }, [loading, user, subscribeToProfiles]);
+
+  useEffect(() => {
     if (error) {
       toast.error(error);
     }
-  }
+  }, [error]);
 
   return (
     <Routes>
