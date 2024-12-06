@@ -5,3 +5,4 @@ export { default as ProtectedRoute } from './ProtectedRoute';
 export { default as CustomDialog } from './CustomDialog';
 export { default as RoleSelectionModal } from './RoleSelectionModal';
 export { default as Layout } from './Layout';
+export { default as Filters } from './Filters';

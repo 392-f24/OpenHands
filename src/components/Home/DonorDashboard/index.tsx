@@ -7,10 +7,13 @@ import OrganizationCard from './OrganizationCard';
 
 import { useOrganizationStore } from '@/stores';
 
-import { SearchBar, LoadingCircle } from '@/components/common';
+import { SearchBar, LoadingCircle, Filters } from '@/components/common';
 
 const DonorDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [needsQuery, setNeedsQuery] = useState('');
+  const [descriptionQuery, setDescriptionQuery] = useState('');
+  const [locationQuery, setLocationQuery] = useState('');
   const {
     organizationProfiles,
     fetchProfiles,
@@ -43,14 +46,48 @@ const DonorDashboard = () => {
     );
   });
 
+  //filtering organizations based on needs and description
+  const filteredByNeedsAndDescription = filter(filteredOrganizations, (org) => {
+    const matchesNeeds = needsQuery
+      ? some(org.needs, (need) =>
+          lowerCase(need.itemName || '').includes(lowerCase(needsQuery))
+        )
+      : true;
+
+    const matchesDescription = descriptionQuery
+      ? lowerCase(org.description || '').includes(lowerCase(descriptionQuery))
+      : true;
+
+    const matchesLocation = locationQuery
+      ? lowerCase(org.location || '').includes(lowerCase(locationQuery))
+      : true;
+
+    return matchesNeeds && matchesDescription && matchesLocation;
+  });
+
   return organizationProfiles.length > 0 ? (
     <div>
-      <SearchBar
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-      />
+      <Box
+        display='flex'
+        gap={2}
+        alignItems='center'
+        mb={3}
+      >
+        <SearchBar
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
+        <Filters
+          needsQuery={needsQuery}
+          setNeedsQuery={setNeedsQuery}
+          descriptionQuery={descriptionQuery}
+          setDescriptionQuery={setDescriptionQuery}
+          locationQuery={locationQuery}
+          setLocationQuery={setLocationQuery}
+        />
+      </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-        {filteredOrganizations.map((org) => (
+        {filteredByNeedsAndDescription.map((org) => (
           <OrganizationCard
             organization={org}
             key={org.uid}
