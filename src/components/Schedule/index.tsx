@@ -71,25 +71,35 @@ const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
         setSelectedDate={setSelectedDate}
       />
 
-      <Box mt={2}>
+      <>
         <Box
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: '1rem',
+            flexDirection: 'column',
+            gap: '0.5rem',
           }}
         >
-          <Typography variant='h6'>
-            Events for {selectedDate?.format('MMMM D, YYYY')}:
-          </Typography>
           <Button
             onClick={() => generateCombinedICSFile(events)}
             variant='contained'
+            sx={{
+              p: '0.5rem 1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+            }}
           >
-            <FileDownload sx={{ marginRight: '0.25rem' }} />
-            Export All Events to Calendar
+            <FileDownload sx={{ marginRight: '0.5rem' }} />
+            Export All to Calendar
           </Button>
+          <Typography
+            variant='h6'
+            textAlign='center'
+          >
+            Events for {selectedDate?.format('MMMM D, YYYY')}:
+          </Typography>
         </Box>
 
         {eventsForSelectedDate.length > 0 ? (
@@ -154,7 +164,7 @@ const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
             No events for this date.
           </Typography>
         )}
-      </Box>
+      </>
 
       {/* Event Details Modal */}
       <Dialog
