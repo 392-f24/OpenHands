@@ -1,4 +1,4 @@
-import { useUserStore, useEventStore } from '@/stores';
+import { useUserStore } from '@/stores';
 
 import ScheduleBase from '@/components/Schedule';
 
@@ -6,8 +6,6 @@ const DonorSchedule = () => {
   const user = useUserStore((state) => state.user);
 
   if (!user) return null;
-
-  const events = useEventStore((store) => store.events);
 
   const title =
     user.role === 'donor'
@@ -20,7 +18,6 @@ const DonorSchedule = () => {
 
   return (
     <ScheduleBase
-      events={events}
       title={title}
       description={description}
     />

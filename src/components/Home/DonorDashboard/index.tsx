@@ -3,15 +3,18 @@ import { useState, useMemo } from 'react';
 
 import OrganizationCard from './OrganizationCard';
 
-import { useOrganizationStore } from '@/stores';
+import { useOrganizationStore, useUserStore } from '@/stores';
 
-import { SearchBar, Filters } from '@/components/common';
+import { SearchBar, Filters, LoadingCircle } from '@/components/common';
 
 const DonorDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [needsQuery, setNeedsQuery] = useState('');
   const [descriptionQuery, setDescriptionQuery] = useState('');
   const [locationQuery, setLocationQuery] = useState('');
+
+  const loading = useUserStore((state) => state.loading);
+  if (loading) return <LoadingCircle />;
 
   const organizationProfiles = useOrganizationStore(
     (state) => state.organizationProfiles
