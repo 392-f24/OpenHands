@@ -1,4 +1,5 @@
 import {
+  Box,
   Card,
   CardContent,
   CardActions,
@@ -83,15 +84,36 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
   );
 
   // Extracted component for header actions
-  const HeaderActions = () =>
-    user && (
+  const HeaderActions = () => (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', sm: 'column', md: 'column', lg: 'row' },
+        alignItems: 'flex-end',
+        gap: '0.25rem',
+        mt: 1,
+      }}
+    >
+      {user && (
+        <Button
+          size='small'
+          sx={{ width: 'fit-content' }}
+          color={isSaved ? 'secondary' : 'primary'}
+          onClick={() => handleAction('save')}
+        >
+          {isSaved ? 'Unsave' : 'Save'}
+        </Button>
+      )}
       <Button
-        color={isSaved ? 'secondary' : 'primary'}
-        onClick={() => handleAction('save')}
+        size='small'
+        sx={{ width: 'fit-content' }}
+        href={organization.website}
+        target='_blank'
       >
-        {isSaved ? 'Unsave' : 'Save'}
+        Visit Website
       </Button>
-    );
+    </Box>
+  );
 
   // Extracted component for needs section
   const NeedsSection = () =>
@@ -137,14 +159,6 @@ const OrganizationCard = ({ organization }: OrganizationCardProps) => {
           >
             {organization.description}
           </Typography>
-          <Button
-            size='small'
-            href={organization.website}
-            target='_blank'
-            sx={{ mt: 1 }}
-          >
-            Visit Website
-          </Button>
         </CardContent>
         <CardActions>
           {hasNeeds && (
