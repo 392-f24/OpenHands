@@ -27,6 +27,7 @@ const DEFAULT_NEED: Supply = {
   pickup: false,
   returnDate: undefined,
   status: false,
+  createdAt: new Date().toISOString(),
   loanable: false,
 };
 
