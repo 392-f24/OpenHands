@@ -9,13 +9,16 @@ import {
   Button,
   IconButton,
 } from '@mui/material';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { FileDownload, CalendarMonth } from '@mui/icons-material';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
 import EventsCalendar from './EventsCalendar';
 
-import generateICSFile from '@/utils/generateICSFile';
+import {
+  generateICSFile,
+  generateCombinedICSFile,
+} from '@/utils/generateICSFile';
 
 interface ScheduleBaseProps {
   events: DonationEvent[];
@@ -49,6 +52,7 @@ const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
       <Typography
         variant='h4'
         mb={2}
+        mt={4}
         textAlign='center'
       >
         {title}
@@ -68,12 +72,26 @@ const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
       />
 
       <Box mt={2}>
-        <Typography
-          variant='h6'
-          mb={1}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '1rem',
+          }}
         >
-          Events for {selectedDate?.format('MMMM D, YYYY')}:
-        </Typography>
+          <Typography variant='h6'>
+            Events for {selectedDate?.format('MMMM D, YYYY')}:
+          </Typography>
+          <Button
+            onClick={() => generateCombinedICSFile(events)}
+            variant='contained'
+          >
+            <FileDownload sx={{ marginRight: '0.25rem' }} />
+            Export All Events to Calendar
+          </Button>
+        </Box>
+
         {eventsForSelectedDate.length > 0 ? (
           eventsForSelectedDate.map((event_) => (
             <Box
@@ -123,8 +141,8 @@ const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
                 onClick={() => generateICSFile(event_)}
                 sx={{ fontSize: 12, display: 'flex', flexDirection: 'column' }}
               >
-                <CalendarMonthIcon fontSize='large' />
-                Add to Calendar
+                <CalendarMonth fontSize='large' />
+                Export to Calendar
               </IconButton>
             </Box>
           ))
