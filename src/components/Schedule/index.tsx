@@ -9,13 +9,16 @@ import {
   Button,
   IconButton,
 } from '@mui/material';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { FileDownload, CalendarMonth } from '@mui/icons-material';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
 import EventsCalendar from './EventsCalendar';
 
-import generateICSFile from '@/utils/generateICSFile';
+import {
+  generateICSFile,
+  generateCombinedICSFile,
+} from '@/utils/generateICSFile';
 
 interface ScheduleBaseProps {
   events: DonationEvent[];
@@ -49,6 +52,7 @@ const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
       <Typography
         variant='h4'
         mb={2}
+        mt={4}
         textAlign='center'
       >
         {title}
@@ -67,13 +71,37 @@ const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
         setSelectedDate={setSelectedDate}
       />
 
-      <Box mt={2}>
-        <Typography
-          variant='h6'
-          mb={1}
+      <>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '1rem',
+            flexDirection: 'column',
+            gap: '0.5rem',
+          }}
         >
-          Events for {selectedDate?.format('MMMM D, YYYY')}:
-        </Typography>
+          <Button
+            onClick={() => generateCombinedICSFile(events)}
+            variant='contained'
+            sx={{
+              p: '0.5rem 1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <FileDownload sx={{ marginRight: '0.5rem' }} />
+            Export All to Calendar
+          </Button>
+          <Typography
+            variant='h6'
+            textAlign='center'
+          >
+            Events for {selectedDate?.format('MMMM D, YYYY')}:
+          </Typography>
+        </Box>
+
         {eventsForSelectedDate.length > 0 ? (
           eventsForSelectedDate.map((event_) => (
             <Box
@@ -123,8 +151,8 @@ const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
                 onClick={() => generateICSFile(event_)}
                 sx={{ fontSize: 12, display: 'flex', flexDirection: 'column' }}
               >
-                <CalendarMonthIcon fontSize='large' />
-                Add to Calendar
+                <CalendarMonth fontSize='large' />
+                Export to Calendar
               </IconButton>
             </Box>
           ))
@@ -136,7 +164,7 @@ const ScheduleBase = ({ events, title, description }: ScheduleBaseProps) => {
             No events for this date.
           </Typography>
         )}
-      </Box>
+      </>
 
       {/* Event Details Modal */}
       <Dialog
