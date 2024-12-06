@@ -1,6 +1,6 @@
 import type { ChangeEvent } from 'react';
 import { useCallback, useMemo, useEffect, useState } from 'react';
-import { TextField, Box, Button } from '@mui/material';
+import { TextField } from '@mui/material';
 import { useSearchParams } from 'react-router-dom';
 import { debounce } from 'es-toolkit/compat';
 
@@ -42,22 +42,14 @@ const SearchBar = ({ onSearchChange }: SearchBarProps) => {
   }, [searchParams, onSearchChange]);
 
   return (
-    <Box
-      display='flex'
-      alignItems='center'
-      mt={3}
-      mx={2}
-    >
-      <TextField
-        label='Search organizations...'
-        variant='outlined'
-        fullWidth
-        sx={{ marginRight: 1 }}
-        value={query}
-        onChange={handleInputChange}
-      />
-      <Button variant='contained'>Recommend</Button>
-    </Box>
+    <TextField
+      label='Search organizations...'
+      variant='outlined'
+      fullWidth
+      sx={{ mx: 1, mt: 3, mr: 2 }}
+      value={query}
+      onChange={handleInputChange}
+    />
   );
 };
 

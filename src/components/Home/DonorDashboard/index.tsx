@@ -1,43 +1,93 @@
 import { Box, Typography } from '@mui/material';
-import { filter, lowerCase, some } from 'es-toolkit/compat';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 import OrganizationCard from './OrganizationCard';
 
 import { useOrganizationStore } from '@/stores';
 
-import { SearchBar } from '@/components/common';
+import { SearchBar, Filters } from '@/components/common';
 
 const DonorDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [needsQuery, setNeedsQuery] = useState('');
+  const [descriptionQuery, setDescriptionQuery] = useState('');
+  const [locationQuery, setLocationQuery] = useState('');
 
   const organizationProfiles = useOrganizationStore(
     (state) => state.organizationProfiles
   );
 
-  // Filtered organizations based on search query
-  const filteredOrganizations = filter(organizationProfiles, (org) => {
-    if (!org.name) return false;
-    const searchTerm = lowerCase(searchQuery);
-    return (
-      lowerCase(org.name).includes(searchTerm) ||
-      lowerCase(org.location).includes(searchTerm) ||
-      some(org.needs, (need) => lowerCase(need).includes(searchTerm))
-    );
-  });
+  const filteredOrganizations = useMemo(() => {
+    return organizationProfiles.filter((org) => {
+      const matchesSearch = searchQuery
+        ? org.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          org.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (org.needs || []).some((need) =>
+            need.itemName.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+        : true;
+
+      const matchesNeeds = needsQuery
+        ? (org.needs || []).some((need) =>
+            need.itemName.toLowerCase().includes(needsQuery.toLowerCase())
+          )
+        : true;
+
+      const matchesDescription = descriptionQuery
+        ? org.description
+            ?.toLowerCase()
+            .includes(descriptionQuery.toLowerCase())
+        : true;
+
+      const matchesLocation = locationQuery
+        ? org.location.toLowerCase().includes(locationQuery.toLowerCase())
+        : true;
+
+      return (
+        matchesSearch && matchesNeeds && matchesDescription && matchesLocation
+      );
+    });
+  }, [
+    organizationProfiles,
+    searchQuery,
+    needsQuery,
+    descriptionQuery,
+    locationQuery,
+  ]);
 
   return organizationProfiles.length > 0 ? (
-    <div>
-      <SearchBar onSearchChange={setSearchQuery} />
-      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-        {filteredOrganizations.map((org) => (
-          <OrganizationCard
-            organization={org}
-            key={org.uid}
-          />
-        ))}
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <SearchBar onSearchChange={setSearchQuery} />
+        <Filters
+          needsQuery={needsQuery}
+          setNeedsQuery={setNeedsQuery}
+          descriptionQuery={descriptionQuery}
+          setDescriptionQuery={setDescriptionQuery}
+          locationQuery={locationQuery}
+          setLocationQuery={setLocationQuery}
+        />
       </Box>
-    </div>
+
+      {filteredOrganizations.map((org) => (
+        <OrganizationCard
+          organization={org}
+          key={org.uid}
+        />
+      ))}
+    </Box>
   ) : (
     <Typography
       variant='body1'
