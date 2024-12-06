@@ -57,16 +57,11 @@ const DonorAlerts = () => {
 
   return (
     <Box sx={{ px: 2 }}>
-      <Typography
-        variant='h4'
-        sx={{ mb: 1, ml: 2 }}
-      >
-        Alerts
-      </Typography>
+      <h1 style={{ marginLeft: '20px' }}>Alerts</h1>
       <Typography
         variant='subtitle1'
         color='text.secondary'
-        sx={{ mb: 3, ml: 2 }}
+        sx={{ mb: 2, ml: 2 }}
       >
         Needs recently added by your saved organizations
       </Typography>
