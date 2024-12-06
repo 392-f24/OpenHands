@@ -18,6 +18,7 @@ interface Supply {
   status: boolean;
   pickup: boolean;
   loanable: boolean;
+  createdAt: string;
   returnDate?: string;
 }
 

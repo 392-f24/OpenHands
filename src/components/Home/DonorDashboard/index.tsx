@@ -2,6 +2,7 @@ import { Box, Typography } from '@mui/material';
 import { filter, lowerCase, some } from 'es-toolkit/compat';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { useSearchParams } from 'react-router-dom';
 
 import OrganizationCard from './OrganizationCard';
 
@@ -11,6 +12,7 @@ import { SearchBar, LoadingCircle } from '@/components/common';
 
 const DonorDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchParams] = useSearchParams();
   const {
     organizationProfiles,
     fetchProfiles,
@@ -22,6 +24,12 @@ const DonorDashboard = () => {
   useEffect(() => {
     fetchProfiles();
     const unsubscribe = subscribeToProfiles;
+
+    // Get search query from URL if it exists
+    const search = searchParams.get('search');
+    if (search) {
+      setSearchQuery(search);
+    }
 
     return () => unsubscribe && unsubscribe();
   }, [fetchProfiles, subscribeToProfiles]);
