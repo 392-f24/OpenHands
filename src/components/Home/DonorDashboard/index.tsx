@@ -6,12 +6,10 @@ import OrganizationCard from './OrganizationCard';
 
 import { useOrganizationStore } from '@/stores';
 
-import { SearchBar, LoadingCircle } from '@/components/common';
+import { SearchBar } from '@/components/common';
 
 const DonorDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const loading = useOrganizationStore((state) => state.loading);
-  if (loading) return <LoadingCircle />;
 
   const organizationProfiles = useOrganizationStore(
     (state) => state.organizationProfiles
