@@ -12,7 +12,7 @@ import { useState, useEffect } from 'react';
 
 import { useEventStore } from '@/stores';
 
-import { getOrCreateDocument } from '@/utils/firebase/firebaseUtils';
+import { getOrDefaultDocuments } from '@/utils/firebase';
 
 const defaultDonorProfile: DonorProfile = {
   uid: '',
@@ -32,15 +32,15 @@ const OrganizationAlerts = () => {
 
   useEffect(() => {
     const fetchDonorEmails = async () => {
+      const donorIds = events.map((event) => event.donorId);
+      const donorProfiles = await getOrDefaultDocuments<DonorProfile>(
+        donorIds,
+        defaultDonorProfile
+      );
+
       const emails: Record<string, string> = {};
-      for (const event of events) {
-        if (event.donorId) {
-          const donorDoc = await getOrCreateDocument<DonorProfile>(
-            event.donorId,
-            defaultDonorProfile
-          );
-          emails[event.donorId] = donorDoc?.email || 'No email available';
-        }
+      for (const profile of donorProfiles) {
+        emails[profile.uid] = profile.email;
       }
       setDonorEmails(emails);
     };
