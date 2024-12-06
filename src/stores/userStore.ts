@@ -32,11 +32,18 @@ const useUserStore = create<UserState>()(
           async (firebaseUser) => {
             if (firebaseUser) {
               const currentUser = get().user;
-              if (currentUser) {
-                await fetchEventsByIds(currentUser.joinedEvents);
+
+              if (currentUser && currentUser.joinedEvents?.length > 0) {
+                try {
+                  await fetchEventsByIds(currentUser.joinedEvents);
+                } catch (error) {
+                  console.error('Error fetching events:', error);
+                }
               }
+              set({ user: currentUser || undefined });
             } else {
               set({ user: undefined });
+              useEventStore.getState().setEvents([]);
             }
             set({ loading: false });
           }
@@ -67,8 +74,6 @@ const useUserStore = create<UserState>()(
         try {
           set({ loading: true });
           await logoutUser(navigate);
-          const eventStore = useEventStore.getState();
-          eventStore.setEvents([]);
 
           set({ user: undefined, error: null });
         } catch (error) {

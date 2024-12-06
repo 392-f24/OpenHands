@@ -1,5 +1,13 @@
 import type { DocumentData, WithFieldValue } from 'firebase/firestore';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+} from 'firebase/firestore';
 
 import { db } from './firebaseConfig';
 
@@ -57,4 +65,50 @@ const updateDocument = async <T>(
   }
 };
 
-export { getOrCreateDocument, updateDocument };
+const getOrDefaultDocuments = async <T extends WithFieldValue<DocumentData>>(
+  uids: string[],
+  defaultData: T
+): Promise<T[]> => {
+  const results: T[] = [];
+  const BATCH_SIZE = 10; // Firestore `in` query limit
+  const collectionName = defaultData.role;
+
+  try {
+    const existingDocs: Record<string, T> = {};
+
+    // Split UIDs into batches to respect Firestore's `in` query limit
+    const batches = [];
+    for (let i = 0; i < uids.length; i += BATCH_SIZE) {
+      batches.push(uids.slice(i, i + BATCH_SIZE));
+    }
+
+    // Fetch existing documents in batches
+    for (const batch of batches) {
+      const docsQuery = query(
+        collection(db, collectionName),
+        where('__name__', 'in', batch)
+      );
+      const querySnapshot = await getDocs(docsQuery);
+      // eslint-disable-next-line unicorn/no-array-for-each
+      querySnapshot.forEach((docSnap) => {
+        if (docSnap.exists()) {
+          existingDocs[docSnap.id] = docSnap.data() as T;
+        }
+      });
+    }
+
+    // Map UIDs to their corresponding documents or default data
+    for (const uid of uids) {
+      results.push(existingDocs[uid] || { ...defaultData, id: uid });
+    }
+  } catch (error) {
+    console.error(
+      `Error in getOrDefaultDocuments for ${collectionName}:`,
+      error
+    );
+  }
+
+  return results;
+};
+
+export { getOrCreateDocument, updateDocument, getOrDefaultDocuments };

@@ -54,6 +54,7 @@ const createDonationEvent = (
       pickup: method === 'pick-up',
       loanable: supply?.loanable || false,
       returnDate: supply?.loanable ? supply.returnDate || '' : '',
+      createdAt: new Date().toISOString(),
     };
   }),
 });

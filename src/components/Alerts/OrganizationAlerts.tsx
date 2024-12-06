@@ -8,11 +8,47 @@ import {
   ListItemText,
 } from '@mui/material';
 import dayjs from 'dayjs';
+import { useState, useEffect } from 'react';
 
 import { useEventStore } from '@/stores';
 
+import { getOrDefaultDocuments } from '@/utils/firebase';
+
+const defaultDonorProfile: DonorProfile = {
+  uid: '',
+  name: '',
+  email: '',
+  profilePic: '',
+  joinedEvents: [],
+  createdAt: new Date().toISOString(),
+  role: 'donor',
+  providedSupplies: [],
+  saved: [],
+};
+
 const OrganizationAlerts = () => {
   const events = useEventStore((store) => store.events);
+  const [donorEmails, setDonorEmails] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const fetchDonorEmails = async () => {
+      const donorIds = events.map((event) => event.donorId);
+      const donorProfiles = await getOrDefaultDocuments<DonorProfile>(
+        donorIds,
+        defaultDonorProfile
+      );
+
+      const emails: Record<string, string> = {};
+      for (const profile of donorProfiles) {
+        emails[profile.uid] = profile.email;
+      }
+      setDonorEmails(emails);
+    };
+
+    if (events.length > 0) {
+      fetchDonorEmails();
+    }
+  }, [events]);
 
   return (
     <Box sx={{ padding: 3 }}>
@@ -41,6 +77,14 @@ const OrganizationAlerts = () => {
               >
                 <strong>Donor:</strong>{' '}
                 {event.title.split('from')[1].trim() || 'Loading...'}{' '}
+                {/* Display donor name */}
+              </Typography>
+              <Typography
+                variant='body2'
+                sx={{ mb: 1 }}
+              >
+                <strong>Donor Email:</strong>{' '}
+                {donorEmails[event.donorId] || 'Loading...'}{' '}
                 {/* Display donor name */}
               </Typography>
               <Typography
