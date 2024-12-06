@@ -9,7 +9,7 @@ import Schedule from '@/pages/Schedule';
 import Saved from '@/pages/Saved';
 import Alerts from '@/pages/Alerts';
 
-import { ProtectedRoute, Layout } from '@/components/common';
+import { ProtectedRoute, Layout, LoadingCircle } from '@/components/common';
 
 const AppRoutes = () => {
   const routeConfig = [
@@ -20,6 +20,7 @@ const AppRoutes = () => {
 
   const loading = useUserStore((state) => state.loading);
   const user = useUserStore((state) => state.user);
+  const fetchProfiles = useOrganizationStore((state) => state.fetchProfiles);
   const subscribeToProfiles = useOrganizationStore(
     (state) => state.subscribeToProfiles
   );
@@ -27,6 +28,8 @@ const AppRoutes = () => {
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'organization')) {
+      fetchProfiles();
+
       const unsubscribe = subscribeToProfiles;
 
       return () => unsubscribe && unsubscribe();
@@ -38,6 +41,8 @@ const AppRoutes = () => {
       toast.error(error);
     }
   }, [error]);
+
+  if (loading) return <LoadingCircle />;
 
   return (
     <Routes>
