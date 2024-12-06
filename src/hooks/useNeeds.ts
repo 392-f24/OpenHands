@@ -25,6 +25,7 @@ const sanitizeNeeds = (needs: Supply[]): Supply[] =>
     status: need.status,
     pickup: need.pickup,
     loanable: need.loanable,
+    createdAt: need.createdAt || new Date().toISOString(),
     ...(need.loanable ? { returnDate: need.returnDate } : {}),
   }));
 
@@ -39,6 +40,8 @@ const useNeeds = (): UseNeedsHook => {
     loanable = false,
     returnDate?: string
   ): Promise<void> => {
+    const createdAt = new Date().toISOString();
+
     const newNeed: Supply = {
       itemName,
       quantityNeeded,
@@ -46,12 +49,21 @@ const useNeeds = (): UseNeedsHook => {
       providedBy: [],
       status: false,
       pickup,
+      createdAt,
       loanable,
       ...(loanable && returnDate ? { returnDate } : {}),
     };
 
     try {
+      console.log('Before sanitizeNeeds:', [
+        ...(organization.needs || []),
+        newNeed,
+      ]);
       const updatedNeeds = sanitizeNeeds([
+        ...(organization.needs || []),
+        newNeed,
+      ]);
+      console.log('After sanitizeNeeds:', [
         ...(organization.needs || []),
         newNeed,
       ]);
@@ -82,7 +94,12 @@ const useNeeds = (): UseNeedsHook => {
       }
 
       const updatedNeeds = [...organization.needs];
-      updatedNeeds[needIndex] = { ...updatedNeeds[needIndex], ...updates };
+      updatedNeeds[needIndex] = {
+        ...updatedNeeds[needIndex],
+        ...updates,
+        // Set status to false if quantityNeeded is greater than 0
+        status: updates.quantityNeeded ? false : updatedNeeds[needIndex].status,
+      };
       const sanitizedNeeds = sanitizeNeeds(updatedNeeds);
 
       await updateProfile({ needs: sanitizedNeeds });

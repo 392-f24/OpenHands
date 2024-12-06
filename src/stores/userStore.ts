@@ -37,6 +37,8 @@ const useUserStore = create<UserState>()(
               }
             } else {
               set({ user: undefined });
+              const eventStore = useEventStore.getState();
+              eventStore.setEvents([]);
             }
             set({ loading: false });
           }

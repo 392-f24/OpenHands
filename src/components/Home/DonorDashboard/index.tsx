@@ -1,40 +1,22 @@
 import { Box, Typography } from '@mui/material';
 import { filter, lowerCase, some } from 'es-toolkit/compat';
-import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { useState } from 'react';
 
 import OrganizationCard from './OrganizationCard';
 
 import { useOrganizationStore } from '@/stores';
 
-import { SearchBar, LoadingCircle } from '@/components/common';
+import SearchBar from '@/components/common/SearchBar';
 
 const DonorDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const {
-    organizationProfiles,
-    fetchProfiles,
-    subscribeToProfiles,
-    loading,
-    error,
-  } = useOrganizationStore();
-
-  useEffect(() => {
-    fetchProfiles();
-    const unsubscribe = subscribeToProfiles;
-
-    return () => unsubscribe && unsubscribe();
-  }, [fetchProfiles, subscribeToProfiles]);
-
-  if (loading) return <LoadingCircle />;
-  if (error) {
-    toast.error(error);
-    return <p>{error}</p>;
-  }
+  const organizationProfiles = useOrganizationStore(
+    (state) => state.organizationProfiles
+  );
 
   // Filtered organizations based on search query
   const filteredOrganizations = filter(organizationProfiles, (org) => {
-    if (org.name === '' || !org.name) return false;
+    if (!org.name) return false;
     const searchTerm = lowerCase(searchQuery);
     return (
       lowerCase(org.name).includes(searchTerm) ||
@@ -45,10 +27,7 @@ const DonorDashboard = () => {
 
   return organizationProfiles.length > 0 ? (
     <div>
-      <SearchBar
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-      />
+      <SearchBar onSearchChange={setSearchQuery} />
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
         {filteredOrganizations.map((org) => (
           <OrganizationCard
